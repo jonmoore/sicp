@@ -5,3 +5,11 @@
 *.scm~
 *.scm#*
 .#*.scm
+
+*.rkt~
+*.rkt#*
+.#*.rkt
+
+*.bak
+*.dep
+*.zo
