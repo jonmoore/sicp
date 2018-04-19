@@ -5,7 +5,7 @@
 (from-to 5 10)
 
 (define double
-  (λ (x)
+  (lambda (x)
     (* 2 x)))
 
 (double 3)

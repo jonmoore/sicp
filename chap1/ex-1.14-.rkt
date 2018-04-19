@@ -44,23 +44,23 @@
       (list amount count (timer)))))
 
 (define (cc-test-amounts cc kinds amounts)
-  (map (λ (amount) (cc-test-amount cc kinds amount))
+  (map (lambda (amount) (cc-test-amount cc kinds amount))
        amounts))
 
 (define (timings cc-data)
   (map cc-datum-timing
-       (filter (λ (datum) (> (cc-datum-time datum) 1e-4))
+       (filter (lambda (datum) (> (cc-datum-time datum) 1e-4))
                cc-data)))
 
 (define (map-tree f tree)
   (if (atom? tree)
       (f tree)
-      (map (λ (t) (map-tree f t))
+      (map (lambda (t) (map-tree f t))
            tree)))
 
 (define (make-amounts from to)
   (map
-   (λ (x) (floor (exp2 x)))
+   (lambda (x) (floor (exp2 x)))
    (from-to-by from to 0.25)))
 
 (define (plot-data cc-data)

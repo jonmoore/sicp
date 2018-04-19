@@ -1,0 +1,87 @@
+# sicp  -*- fill-column: 70; -*-
+
+* Intro
+SICP exercises and related code
+
+* rackunit test directories
+
+These directories show different ways of testing code in racket.  The
+pattern described for rackunit5 fits our needs well.
+
+*** rackunit 1
+=sicp2-module-with-test-module.rkt=
+
+Single file using ~#lang sicp2~, with a test module included.  The
+~sicp2~ language is essentially Racket.
+
+*** rackunit2
+
+=sicp-module-with-test-module.rkt=
+
+Single file using ~#lang sicp~, with a test module included.
+
+** rackunit3
+- =sicp-module.rkt=
+- =testing-sicp-module.rkt=
+
+=testing-sicp-module.rkt= requires a module defined in
+=sicp-module.rkt=, then tests it with its own test module.
+
+** rackunit4
+
+- =sicp-script.rkt=
+- =sicp-test-script.rkt=
+
+=sicp-script.rkt= is a Racket script without any ~#lang~.
+=sicp-test-script.rkt= loads it and then runs tests with ~run-tests~.
+The definitions in =sicp-script.rkt= are evaluated at top-level and so
+are visible to the test code.
+
+*** rackunit5
+
+- =double.rkt=
+- =math.rkt=
+
+Both files are ~#lang sicp~ modules containing ~test~ and ~main~
+sub-modules defined with ~module+~, which is imported by requiring
+~racket~ (to avoid use of ~racket~ definitions, see the note below).
+
+Inline tests are provided via ~(module+ test)~.  This can be used
+multiple times in one file, including using forward references to
+definienda, i.e. the module structure has precedence over the text
+ordering.
+
+Similarly, a main function is provided in ~(module+ main)~.  We can
+also inline the main function in fragments throughout the file if we
+like.
+
+Code reuse is performed via ~provide~ and ~require~.  For example,
+=math.rkt= requires =double.rkt= and calls the ~double~ function that
+it provides.
+
+In the command-line racket REPL definitions from sub-modules defined
+with can be accessed as below.
+  : (require (submod "double.rkt" main))
+In the Geiser REPL after entering =double.rkt= this does not to
+work.  However it does work from a top-level Geiser REPL.
+
+In Emacs ~C-c C-a~ can be used to enter the scope of the module (or
+sub-modules) as needed
+
+*** Avoiding use of ~racket~ definitions
+
+Since we use 
+: (#%require racket rackunit)
+to allow using RackUnit this brings Racket's definitions in the scope
+of exercise code.  To avoid this we can use a ~sicp~ sub-module as in
+: (module inner sicp
+:   (define baz 1)
+:   (#%provide baz))
+: (require 'inner)
+Alternatively we could put the definitions in their own file, with
+separate tests.  A minor point: the ~require~ does not work when
+invoked from a test sub-module.
+
+It's also possible that we could use ~only-in~ to limit what's
+imported from ~racket~.
+

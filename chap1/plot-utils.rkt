@@ -11,7 +11,7 @@
 (define (plot-points-ex-pairs tfm-x tfm-y data)
   (plot
    (points
-    (map (Î» (list-xy)
+    (map (lambda (list-xy)
            (list (tfm-x (car list-xy))
                  (tfm-y (cadr list-xy))))
          data))))
@@ -21,7 +21,7 @@
   (let ((log-fn (lambda (x) (logx-basey x base))))
     (plot-points-ex-pairs log-fn log-fn
                           (filter
-                           (Î» (list-xy)
+                           (lambda (list-xy)
                              (and (> (car list-xy) 0)
                                   (> (cadr list-xy) 0)))
                            data))))

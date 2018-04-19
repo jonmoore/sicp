@@ -54,14 +54,21 @@
          (fast-prime? n (- times 1)))
         (else false)))
 (define (make-fast-prime? times)
-  (λ (n) (fast-prime? n times)))
+  (lambda (n) (fast-prime? n times)))
 
 ; ex 1.27
+;; (define (full-fermat n)
+;;   (fold-left (lambda (x y) (and x y))
+;;              #t
+;;              (map (lambda (a)
+;;                     (= (expmod a n n) a))
+;;                   (from-to 0 n))))
+
 (define (full-fermat n)
-  (fold-left (lambda (x y) (and x y)) #t
-             (map (lambda (a)
-                    (= (expmod a n n) a))
-                  (from-to 0 n))))
+  ;; Below, every should behave the same as Scheme's
+  (every (lambda (a)
+           (= (expmod a n n) a))
+         (from-to 0 n)))
 
 (define (start-timed-prime-test n start-time prime?)
   (if (prime? n)
@@ -69,7 +76,7 @@
       #f))
 
 (define (make-timed-test prime?)
-  (λ (n)
+  (lambda (n)
     (start-timed-prime-test n (runtime) prime?)))
 
 (define (results-n-primes-larger-than-x n x prime?)
@@ -93,7 +100,7 @@
 
 (define (prime-timings base powers num-primes prime?)
   (map
-   (λ (n)
+   (lambda (n)
      (list
       n
       (average
@@ -102,7 +109,7 @@
              num-primes
              n
              (make-timed-test prime?))))))
-   (map (λ (power)
+   (map (lambda (power)
           (+ 1 (expt base power)))
         powers)))
 
@@ -118,12 +125,12 @@
  (list 199 1999 19999))
 
 (map (make-timed-test prime?sd)
-     (map (λ (power)
+     (map (lambda (power)
             (- (* 2 (expt 10 power)) 1))
           (from-to 2 12)))
 
 (define (transform-test test transformer)
-  (λ (n)
+  (lambda (n)
     (let ((test-n (test n)))
       (if test-n
           (transformer n test-n)
@@ -171,3 +178,65 @@
 (map full-fermat
        '(561 1105 1729 2465 2821 6601))
 
+; ex 1.28
+
+;; (define (expmod base exp m)
+;;   (cond ((= exp 0) 1)
+;;         ((even? exp)
+;;          (remainder 
+;;           (square (expmod base (/ exp 2) m))
+;;           m))
+;;         (else
+;;          (remainder 
+;;           (* base (expmod base (- exp 1) m))
+;;           m))))
+
+
+(define (non-trival-square-root-of-one? candidate-square-root m)
+  (and (= (remainder (square candidate-square-root) m) 1)
+       (not (= candidate-square-root 1))
+       (not (= candidate-square-root (- m 1)))))
+
+(define (expmod-sig base exp m)
+  "Raises base to the power of exp modulo m.  Version of expmod that
+will signal if it discovers a non-trivial square root of 1"
+
+  (display (list base exp m))
+  (cond ((= exp 0) 1)
+        ((even? exp)
+         (let ((to-square (expmod-sig base (/ exp 2) m)))
+           (if (non-trival-square-root-of-one? to-square m)
+               0 ;; signal
+               (remainder (square to-square) m))))
+        ((odd? exp)
+         (remainder 
+          (* base (expmod-sig base (- exp 1) m))
+          m))
+        (else (error "Should not reach this"))))
+
+(define (miller-rabin-check a n)
+  "A check used in Miller-Rabin primality tests.  Returns #t if
+testing with a is consistent with n being prime."
+  (= 1 (expmod-sig a (- n 1) n)))
+
+(define (full-miller-rabin-test n)
+  "Miller-Rabin primality test.  "
+  (every (lambda (a)
+           (miller-rabin-check a n))
+         (from-to 0 n)))
+
+(define (repeated-check check num-checks)
+  "Runs check up to num-checks times. Returns #f early if any call of
+check returns false, otherwise (i.e. all num-checks calls return a
+true value) returns #t."
+  (cond ((= num-checks 0) #t)
+        ((not (check)) #f)
+        (else (repeated-check check (- num-checks 1)))))
+
+(define (fast-miller-rabin-test n times)
+  "Miller-Rabin primality test.  "
+  (repeated-check
+   (lambda ()
+     (miller-rabin-check
+      (+1 (random (- n 1))) n))
+   times))
