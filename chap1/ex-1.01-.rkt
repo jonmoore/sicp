@@ -20,7 +20,8 @@
 (module+ main
   (display 
    '(/ (+ 5 4 (- 2 (- 3 (+ 6 (/ 4 5)))))
-       (* 3 (- 6  2) (- 2 7)))))
+       (* 3 (- 6  2) (- 2 7))))
+  (newline))
 
 ;; ex 1.3
 (define (sum-larger-two-squares a b c)
@@ -29,12 +30,11 @@
      (square (min a b c))))
 
 (module+ main
-  (sum-larger-two-squares 2 3 5)
-  (sum-larger-two-squares 2 3 3)
-  (sum-larger-two-squares 2 3 4))
+  (printf "(sum-larger-two-squares 2 3 5) ~a~n"
+          (sum-larger-two-squares 2 3 5)))
 
 (module+ test
-  (check-= (sum-larger-two-squares 3 2 4) 25 1e-6)
+  (check-= (sum-larger-two-squares 3 2 4) 5 1e-6)
   (check-= (sum-larger-two-squares 4 3 2) 25 1e-6)
   (check-= (sum-larger-two-squares 2 4 3) 25 1e-6)
   (check-= (sum-larger-two-squares 2 2 3) 13 1e-6)

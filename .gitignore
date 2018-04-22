@@ -13,3 +13,5 @@
 *.bak
 *.dep
 *.zo
+
+*.dummy

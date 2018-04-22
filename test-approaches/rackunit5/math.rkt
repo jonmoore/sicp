@@ -6,7 +6,7 @@
   (test-case
    "check twice 2 is 4"
    (check = (double 2) 4)
-   (check = (quad 3) 11)))
+   (check = (quad 3) 12)))
 
 (define (quad x)
   (double (double x)))
@@ -19,3 +19,7 @@
 (module+ main
   (printf "4 times 3 is ~a" (quad 3)))
 
+;  
+;  
+;  
+;  

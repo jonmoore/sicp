@@ -1,0 +1,82 @@
+
+Some notes on creating a makefile to help manage our code and tests.
+
+Assumptions
+- directory structure known
+- individual files unknowm
+- pattern-based rules using extensions are expected
+
+Thoughts
+- use raco make for compiling modules
+- use a dependency chain .rkt->.zo->.test_results to update test_results.
+
+how to determine which files have tests associated?
+
+
+* raco make updating
+    
+  Conclusions:
+  - updates timestamps of compiled .so files in the natural way, based on time
+    stamps.
+  - regenerates .dep files only when needed - if the source files change
+    timestamp but not content then they are not regenerated.
+    
+*** Testing notes 
+
+    Try this with test-approaches\rackunit5\math.rkt, which depends on the local double.rkt
+
+    raco make math.rkt
+
+    #+BEGIN_SRC bat
+    > dir compiled
+     Volume in drive C is Local Disk
+     Volume Serial Number is C034-A84E
+
+     Directory of c:\Users\jonat\src\sicp\test-approaches\rackunit5\compiled
+
+    04/21/2018  11:03 AM    <DIR>          .
+    04/21/2018  11:03 AM    <DIR>          ..
+    04/21/2018  11:03 AM               282 double_rkt.dep
+    04/21/2018  11:21 AM             4,773 double_rkt.zo
+    04/21/2018  11:03 AM               339 math_rkt.dep
+    04/21/2018  11:21 AM             4,241 math_rkt.zo
+    #+END_SRC
+
+    Contents of math_rkt.dep (after reformatting whitespace)
+    #+BEGIN_SRC
+    ("6.11"
+     ("54e665c128b9c5d9a280bdeb92b9694750eb3ea3" . "2aaf9d6e17169e42bf25711392e593e997336e6a")
+     (collects #"racket" #"main.rkt")
+     (collects #"racket" #"runtime-config.rkt")
+     (collects #"rackunit" #"main.rkt")
+     (collects #"sicp" #"lang" #"reader.rkt")
+     (collects #"sicp" #"main.rkt")
+     (collects #"test-approaches" #"rackunit5" #"double.rkt"))
+    #+END_SRC
+
+    Run raco make again - verified that .zo files are not updated.
+
+    After removing deps files, ran raco make again.  Both zo and dep files were
+    updated.
+
+    Now touch double.rkt (contents stay the same)
+
+    checked md5
+
+    #+BEGIN_SRC dired
+      c:/Users/jonat/src/sicp/test-approaches/rackunit5/compiled:
+      total used in directory 18 available 171345880
+      drwxrwxrwx 4096 04-21 11:33 ..
+      drwxrwxrwx 4096 04-21 11:30 .
+      -rw-rw-rw-  282 04-21 11:30 double_rkt.dep
+      -rw-rw-rw- 4773 04-21 11:34 double_rkt.zo
+      -rw-rw-rw-  339 04-21 11:30 math_rkt.dep
+      -rw-rw-rw- 4241 04-21 11:34 math_rkt.zo
+    #+END_SRC
+
+    So deps stay the same, zo files updates
+
+    Now touch math.rkt
+
+    math_rkt.zo is updated, double.rkt is not
+

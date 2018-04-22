@@ -1,0 +1,8 @@
+foo
+bar
+foo1foo2
+foobar
+foo1 foo2
+foo1 bar foo2
+foo bar
+foo1barfoo2
