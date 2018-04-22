@@ -18,21 +18,10 @@ ZO_FILES := $(join $(patsubst %, %compiled\, $(dir $(RKT_TEST_FILES))), \
 		  $(patsubst %.rkt, %_rkt.zo, $(notdir $(RKT_TEST_FILES))))
 
 raco_make:
-	@raco make $(RKT_TEST_FILES)
+	@raco make -j 4 $(RKT_TEST_FILES)
 
 raco_test.dummy: $(ZO_FILES)
-	raco test -t -x $(subst \compiled,,$(?:_rkt.zo=.rkt))
+	raco test -j 4 -q -x $(subst \compiled,,$(?:_rkt.zo=.rkt))
 	@echo testing_done > raco_test.dummy
 
 test: raco_make raco_test.dummy
-
-# Notes on this makefile
-#
-# The string manipulation is a bit hacky and it might be possible to
-# improve this by:
-# - making better use of make's string functions or
-# - running make multiple times from a wrapper script
-#
-# Two more generic solutions have been rejected for now:
-# - Paul Smith's approach to multi-architecture builds; heavier than this needs
-# - guile chdir; too magical/requires new-ish make

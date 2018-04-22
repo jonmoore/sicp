@@ -1,9 +1,9 @@
 #lang sicp
-
-(#%require racket rackunit)
+(#%require racket rackunit "../utils/sicp-utils.rkt")
 
 ;; ex-1.1
 (module+ main
+  (begin-example "1.1")
   (define a 3)
   (define b (+ a 1 ))
 
@@ -18,6 +18,7 @@
 
 ;; ex-1.2
 (module+ main
+  (begin-example "1.2")
   (display 
    '(/ (+ 5 4 (- 2 (- 3 (+ 6 (/ 4 5)))))
        (* 3 (- 6  2) (- 2 7))))
@@ -30,11 +31,12 @@
      (square (min a b c))))
 
 (module+ main
+  (begin-example "1.3")
   (printf "(sum-larger-two-squares 2 3 5) ~a~n"
           (sum-larger-two-squares 2 3 5)))
 
 (module+ test
-  (check-= (sum-larger-two-squares 3 2 4) 5 1e-6)
+  (check-= (sum-larger-two-squares 3 2 4) 25 1e-6)
   (check-= (sum-larger-two-squares 4 3 2) 25 1e-6)
   (check-= (sum-larger-two-squares 2 4 3) 25 1e-6)
   (check-= (sum-larger-two-squares 2 2 3) 13 1e-6)

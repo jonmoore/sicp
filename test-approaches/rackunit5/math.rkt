@@ -18,8 +18,3 @@
 
 (module+ main
   (printf "4 times 3 is ~a" (quad 3)))
-
-;  
-;  
-;  
-;  

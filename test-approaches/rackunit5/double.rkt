@@ -4,24 +4,21 @@
 ;; rackunit.
 (#%require racket rackunit)
 
-(define (double x)
-  (* x 2))
-
 ;; The #%require above brings racket's definitions in scope.  To avoid
 ;; this we can use a sub-module with language sicp.  Alternatively we
 ;; could put the definitions in their own file, with separate tests.
 (module inner sicp
   (define baz 1)
-  (#%provide baz)
+  (define (double x)
+    (* x 2))
   ;; (printf "hello\n") ;; Racket's printf is unbound here 
-  )
+  (#%provide baz double))
 
 (require 'inner)
 
 (module+ test
-
    (test-case
-   "check using definition from sub-module"
+   "check using definition "
    (check = baz 1))
 
   (test-case

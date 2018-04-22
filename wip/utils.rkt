@@ -1,14 +1,5 @@
 #lang sicp
 
-;; unfortunately this works only with DrRacket, not Emacs, so probably
-;; best not to use it.
-
-(#%provide λ)
-;; treat λ and lambda as equivalent
-(define-syntax λ
-  (syntax-rules ()
-    ((_ . more) (lambda . more))))
-
 (#%provide make-timer)
 (define (make-timer)
   (define (timer-from start)
@@ -41,7 +32,7 @@
 (#%provide length)
 (define (length list)
   (fold-left
-   (λ (length-so-far _) (inc length-so-far))
+   (lambda (length-so-far _) (inc length-so-far))
    0 list))
 
 (#%provide average)
@@ -105,7 +96,7 @@ since we should be able to import the Scheme version."
 (define (map-tree f tree)
   (if (atom? tree)
       (f tree)
-      (map (λ (t) (map-tree f t))
+      (map (lambda (t) (map-tree f t))
            tree)))
 
 (#%provide from-to)
