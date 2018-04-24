@@ -8,10 +8,7 @@
 (define (double x)
   (* x 2))
 
-(define (bad-double x)
-  (* x 22))
-
 (define (triple x)
   (* x 3))
 
-(#%provide double bad-double triple)
+(#%provide double triple)

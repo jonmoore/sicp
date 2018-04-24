@@ -5,13 +5,13 @@
 # been rebuilt by a raco make pass then we want to re-run the tests
 # from the corresponding .rkt file.
 #
-.PHONY: default raco_make test
+.PHONY: default raco_make test clean
 default: test
 
 # Find all the .rkt files using rackunit (the test is not exact) in
 # RKT_DIRS
 RKT_DIRS := test-approaches chap1
-FIND_TEST_FILES=$(shell cmd /c "findstr /m /s require.*rackunit  $(rkt_dir)\*.rkt")
+FIND_TEST_FILES=$(shell cmd /c "findstr /m /s rackunit  $(rkt_dir)\*.rkt")
 RKT_TEST_FILES := $(foreach rkt_dir, $(RKT_DIRS), $(FIND_TEST_FILES))
 
 ZO_FILES := $(join $(patsubst %, %compiled\, $(dir $(RKT_TEST_FILES))), \
@@ -25,3 +25,7 @@ raco_test.dummy: $(ZO_FILES)
 	@echo testing_done > raco_test.dummy
 
 test: raco_make raco_test.dummy
+
+clean:
+	del /s *.zo
+	del raco_test.dummy

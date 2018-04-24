@@ -1,4 +1,4 @@
-;; Example for testing using rackunit
+;; Example for testing using RackUnit
 ;;
 ;; This file is a script whose definitions we want to test
 ;; externally.
