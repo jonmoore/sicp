@@ -5,30 +5,28 @@ SICP exercises and related code
 
 * rackunit test directories
 
-These directories show different ways of testing code in racket.  The
-pattern described for rackunit5 fits our needs well.
+These directories show different ways of testing code in Racket.  The
+pattern used in rackunit7 fits our needs well.
 
-*** rackunit 1
-=sicp2-module-with-test-module.rkt=
+*** rackunit1
+- =sicp2-module-with-test-module.rkt=
 
 Single file using ~#lang sicp2~, with a test module included.  The
 ~sicp2~ language is essentially Racket.
 
 *** rackunit2
-
-=sicp-module-with-test-module.rkt=
+- =sicp-module-with-test-module.rkt=
 
 Single file using ~#lang sicp~, with a test module included.
 
-** rackunit3
+*** rackunit3
 - =sicp-module.rkt=
 - =testing-sicp-module.rkt=
 
 =testing-sicp-module.rkt= requires a module defined in
 =sicp-module.rkt=, then tests it with its own test module.
 
-** rackunit4
-
+*** rackunit4
 - =sicp-script.rkt=
 - =sicp-test-script.rkt=
 
@@ -38,13 +36,13 @@ The definitions in =sicp-script.rkt= are evaluated at top-level and so
 are visible to the test code.
 
 *** rackunit5
-
 - =double.rkt=
 - =math.rkt=
 
 Both files are ~#lang sicp~ modules containing ~test~ and ~main~
 sub-modules defined with ~module+~, which is imported by requiring
-~racket~ (to avoid use of ~racket~ definitions, see the note below).
+~racket~ (update: this is sub-optimal; see below for how to avoid
+importing ~racket~ definitions).
 
 Inline tests are provided via ~(module+ test)~.  This can be used
 multiple times in one file, including using forward references to
@@ -61,27 +59,64 @@ it provides.
 
 In the command-line racket REPL definitions from sub-modules defined
 with can be accessed as below.
-  : (require (submod "double.rkt" main))
+#+BEGIN_SRC scheme
+  (require (submod "double.rkt" main))
+#+END_SRC
 In the Geiser REPL after entering =double.rkt= this does not to
 work.  However it does work from a top-level Geiser REPL.
 
 In Emacs ~C-c C-a~ can be used to enter the scope of the module (or
 sub-modules) as needed
 
-*** Avoiding use of ~racket~ definitions
+*** rackunit6
+- =sicp-example.rkt=
+- =test-sicp-example.rkt=
 
-Since we use 
+  This example shows how to test a sicp module without bringing any
+  unwanted racket definitions into scope, including in the test code.
+  The key is the use of ~only~ in the ~#%require~, as below.
+#+BEGIN_SRC
+(#%require  (only racket module+))
+#+END_SRC
+
+*** rackunit7
+- =double.rkt=
+- =math.rkt=
+
+An improved version of rackunit5, based on the approach in rackunit6,
+i.e. using ~#%require~ with ~only~ to avoid bringing unwanted racket
+definitions into scope.
+
+* Avoiding use of ~racket~ definitions
+
+Whenever we ~require~ or ~#%require~ ~racket~ as below,
 : (#%require racket rackunit)
-to allow using RackUnit this brings Racket's definitions in the scope
-of exercise code.  To avoid this we can use a ~sicp~ sub-module as in
-: (module inner sicp
-:   (define baz 1)
-:   (#%provide baz))
-: (require 'inner)
-Alternatively we could put the definitions in their own file, with
-separate tests.  A minor point: the ~require~ does not work when
-invoked from a test sub-module.
+this brings Racket's definitions into scope which is liable to cause
+conflicts with sicp definitions (e.g. the types of lists will not
+match).
 
-It's also possible that we could use ~only-in~ to limit what's
-imported from ~racket~.
+To avoid this we can use the options below.
 
+*** use ~only~ or ~only-in~ to restrict the imported definitions
+
+      #+BEGIN_SRC scheme
+(#%require  (only racket module+))
+      #+END_SRC
+
+      #+BEGIN_SRC scheme
+(require  (only-in racket module+))
+      #+END_SRC
+
+      For reference see:
+      - [[https://docs.racket-lang.org/reference/require.html][documentation for "require"]], which includes
+      - [[https://docs.racket-lang.org/reference/require.html#%2528form._%2528%2528quote._~23~25kernel%2529._~23~25require%2529%2529][documentation for #%require]]
+
+*** make definitions in a ~sicp~ sub-module
+#+BEGIN_SRC scheme
+(module inner sicp
+  (define baz 1)
+  (#%provide baz))
+(require 'inner)
+#+END_SRC
+
+*** make definitions in a ~#lang sicp~ file
