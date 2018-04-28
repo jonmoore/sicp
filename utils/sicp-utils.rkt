@@ -2,6 +2,13 @@
 
 (#%require (only racket module+) rackunit)
 
+;; This creates a side-effect when this file is imported, making
+;; racket output use "()" rather than "{}" to print lists created in
+;; the sicp language.  We want this side-effect.  It's a subset of
+;; r5rs/init.
+(#%require (only racket print-mpair-curly-braces))
+(print-mpair-curly-braces #f)
+
 (define (disp text)
   (display text (current-output-port)))
 
@@ -50,3 +57,10 @@
 (define (constant x)
   (lambda () x))
 
+
+(#%provide map-tree)
+(define (map-tree f tree)
+  (if (atom? tree)
+      (f tree)
+      (map (lambda (t) (map-tree f t))
+           tree)))
