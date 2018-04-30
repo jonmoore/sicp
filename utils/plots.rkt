@@ -2,6 +2,7 @@
 
 (#%require plot)
 (#%require "../utils/srfi-1.rkt")
+(#%require "../utils/sicp-utils.rkt")
 
 (define (loglog-valid-pairs xy-pairs)
   (filter
@@ -16,9 +17,23 @@
                (log (cadr xy) base)))
        xy-pairs))
 
+(#%provide loglog-points)
+(define (loglog-points base data)
+  (loglog-map base
+              (loglog-valid-pairs data)))
+
 (#%provide plot-points-loglog)
 (define (plot-points-loglog base data)
   (plot
    (points
-    (loglog-map base
-                (loglog-valid-pairs data)))))
+    (loglog-points base data))))
+
+(#%require (prefix r/ racket))
+
+(#%provide pairs->plottable)
+(define (pairs->plottable pairs)
+  (points (list->r/list pairs)))
+
+(#%provide plottables->plottable)
+(define (plottables->plottable plottables)
+  (list->r/list plottables))

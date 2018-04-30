@@ -9,8 +9,14 @@
 (#%require (only racket print-mpair-curly-braces))
 (print-mpair-curly-braces #f)
 
+(#%provide disp)
 (define (disp text)
   (display text (current-output-port)))
+
+(#%provide displn)
+(define (displn text)
+  (disp text)
+  (newline))
 
 (#%provide begin-example)
 (define (begin-example text)
@@ -64,3 +70,14 @@
       (f tree)
       (map (lambda (t) (map-tree f t))
            tree)))
+
+(#%require (prefix r/ racket))
+(#%provide list->r/list)
+(define (list->r/list lis)
+  "Map a sicp list to a racket list"
+  (define (iter accum rest)
+    (if (null? rest)
+        accum
+        (iter (r/cons (car rest) accum) (cdr rest))))
+  (iter (r/list) lis))
+    
