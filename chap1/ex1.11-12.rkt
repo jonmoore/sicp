@@ -1,6 +1,6 @@
 #lang sicp
 (#%require
- racket
+ (only racket module+)
  rackunit
  "../utils/sicp-utils.rkt"
  "../utils/srfi-1.rkt"
@@ -32,13 +32,13 @@
 
 (module+ main
   (begin-example "1.11")
-  (displayln "The fib3 series")
+  (displn "The fib3 series")
   (for-each
    (lambda (n)
      (display (list n (fib3-iter n)))
      (display " "))
    (iota 6))
-  (displayln "..."))
+  (displn "..."))
 
 (module+ test
   (test-equal?
@@ -76,5 +76,5 @@
 
 (module+ main
   (begin-example "1.12")
-  (displayln "A Pascal triangle")
+  (displn "A Pascal triangle")
   (pas-tri 6))
