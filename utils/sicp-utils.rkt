@@ -80,4 +80,29 @@
         accum
         (iter (r/cons (car rest) accum) (cdr rest))))
   (iter (r/list) lis))
-    
+
+(#%provide average)
+(define (average x y)
+  (/ (+ x y) 2))
+
+(#%provide abs-error)
+(define (abs-error x y)
+  (abs (- x y)))
+
+(#%provide rel-error)
+(define (rel-error x y)
+  (/ (abs-error x y)
+     (average (abs x) (abs y))))
+
+(#%provide close-in-abs-error?)
+(define (close-in-abs-error? x y abs-tol)
+  (<= (abs-error x y) abs-tol))
+
+(#%provide close-in-rel-error?)
+(define (close-in-rel-error? x y rel-tol)
+  (<= (rel-error x y) rel-tol))
+
+(#%provide close-in-joint-error-or?)
+(define (close-in-joint-error-or? x y abs-tol rel-tol)
+  (or (close-in-abs-error? x y abs-tol)
+      (close-in-rel-error? x y rel-tol)))

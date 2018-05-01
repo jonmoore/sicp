@@ -2,26 +2,6 @@
 (#%require racket rackunit "../utils/sicp-utils.rkt")
 
 ;; ex 1.7
-(define (average x y)
-  (/ (+ x y) 2))
-
-(define (abs-error x y)
-  (abs (- x y)))
-
-(define (rel-error x y)
-  (/ (abs-error x y)
-     (average (abs x) (abs y))))
-
-(define (close-in-abs-error? x y abs-tol)
-  (<= (abs-error x y) abs-tol))
-
-(define (close-in-rel-error? x y rel-tol)
-  (<= (rel-error x y) rel-tol))
-
-(define (close-in-joint-error-or? x y abs-tol rel-tol)
-  (or (close-in-abs-error? x y abs-tol)
-      (close-in-rel-error? x y rel-tol)))
-
 (define (sqrt x)
   (define (improve guess)
     (average guess (/ x guess)))
