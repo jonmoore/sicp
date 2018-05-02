@@ -1,36 +1,5 @@
 #lang sicp
 
-; ex-1.19
-
-; T <->
-; q+p q
-; q   p
-; T*T <->
-; (q+p)(q+p)+q^2 (q+p)q+qp
-; q(q+p)+pq       q^2 +p^2
-; q' = q^2+2pq
-; p' = q^2+p^2
-
-(define (fib n)
-  (fib-iter 1 0 0 1 n))
-
-(define (fib-iter a b p q count)
-;  (display (list a b p q count))
-  (cond ((= count 0) b)
-        ((even? count) (fib-iter a
-                                 b
-                                 (+ (* q q) (* p p))
-                                 (+ (* q q) (* 2 p q))
-                                 (/ count 2)
-                                 ))
-        (else (fib-iter (+ (* b q) (* a q) (* a p))
-                        (+ (* b p) (* a q))
-                        p
-                        q
-                        (- count 1)))))
-
-(map fib (list 1 2 3 4 5 6 7 8 9 10))
-
 ; ex-1.20
 ; (gcd 206 40) 0
 ; (gcd 40 6)   1
