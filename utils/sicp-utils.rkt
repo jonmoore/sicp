@@ -7,6 +7,7 @@
 ;; the sicp language.  We want this side-effect.  It's a subset of
 ;; r5rs/init.
 (#%require (only racket print-mpair-curly-braces))
+(#%require "srfi-1.rkt")
 (print-mpair-curly-braces #f)
 
 (#%provide disp)
@@ -106,3 +107,11 @@
 (define (close-in-joint-error-or? x y abs-tol rel-tol)
   (or (close-in-abs-error? x y abs-tol)
       (close-in-rel-error? x y rel-tol)))
+
+(#%provide sum)
+(define (sum lis)
+  (fold + 0 lis))
+
+(#%provide product)
+(define (product lis)
+  (fold * 1 lis))
