@@ -1,0 +1,489 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2018-05-06 Sun 18:34 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>&lrm;</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="Jonathan Moore" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        displayAlign: "center",
+        displayIndent: "0em",
+
+        "HTML-CSS": { scale: 100,
+                        linebreaks: { automatic: "false" },
+                        webFont: "TeX"
+                       },
+        SVG: {scale: 100,
+              linebreaks: { automatic: "false" },
+              font: "TeX"},
+        NativeMML: {scale: 100},
+        TeX: { equationNumbers: {autoNumber: "AMS"},
+               MultLineWidth: "85%",
+               TagSide: "right",
+               TagIndent: ".8em"
+             }
+});
+</script>
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML"></script>
+</head>
+<body>
+<div id="content">
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org1073f62">Exercise 1.20</a>
+<ul>
+<li><a href="#org565430d">Normal order</a></li>
+<li><a href="#org34a1a5b">Applicative Order</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org1073f62" class="outline-2">
+<h2 id="org1073f62">Exercise 1.20</h2>
+<div class="outline-text-2" id="text-org1073f62">
+</div>
+<div id="outline-container-org565430d" class="outline-3">
+<h3 id="org565430d">Normal order</h3>
+<div class="outline-text-3" id="text-org565430d">
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #32cd32;">define</span> (<span style="color: #cd5c5c; background-color: #00008b;">gcd</span> a b)
+  (<span style="color: #32cd32;">if</span> (= b 0)
+      a
+      (gcd b (remainder a b))))
+</pre>
+</div>
+
+<p>
+Assume that the evaluation requires <code>n</code> calls to <code>gcd</code>.  After
+expansion, the callstack looks like
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #32cd32;">if</span> (= b_1 0)
+    a_1
+    (<span style="color: #32cd32;">if</span> (= b_2 0)
+        a_2
+        (<span style="color: #32cd32;">if</span> (= b_3 0)
+            <span style="color: #87ceeb;">;; </span><span style="color: #87ceeb;">...</span>
+            (<span style="color: #32cd32;">if</span> (= b_n 0)
+                a_n
+                (gcd b_n (remainder a_n b_n)))
+                <span style="color: #87ceeb;">;; </span><span style="color: #87ceeb;">...</span>
+                )))
+</pre>
+</div>
+<p>
+where \(a_i\) and \(b_i\) are the arguments to the ith call to <code>gcd</code>. We
+can simplify this by dropping unevaluated terms and replacing \(a_{n}\)
+by \(b_{n-1}\), taking \(b_0 = a_1\).
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #32cd32;">if</span> (= b_1 0)
+    (<span style="color: #32cd32;">if</span> (= b_2 0)
+        (<span style="color: #32cd32;">if</span> (= b_3 0)
+            <span style="color: #87ceeb;">;; </span><span style="color: #87ceeb;">...</span>
+            (<span style="color: #32cd32;">if</span> (= b_n 0)
+                b_{n-1} <span style="color: #87ceeb;">;; </span><span style="color: #87ceeb;">a_n </span>
+                <span style="color: #87ceeb;">;; </span><span style="color: #87ceeb;">...</span>
+                )))
+</pre>
+</div>
+
+<p>
+The following is useful in summing Fibonacci-like sequences:
+</p>
+<ul class="org-ul">
+<li>If a sequence \(G\) obeys \(G_{n+1}=G_{n}+G_{n-1}\), i.e. the Fibonacci
+recursion, then it's the solution of a second-order difference
+equation with a two-dimensional solution space spanned by any two
+independent solutions, so can assume \(G_n = \alpha F_n + \beta
+  F_{n-1}\), hence \(G_1 = \alpha, G_2 = \alpha + \beta\), hence \(\alpha
+  = G_1, \beta = G_2 - G_1\), hence \(G_n = G_1 F_n + (G_2-G_1)
+  F_{n-1}\).</li>
+<li>If a sequence \(H\) obeys \(H_{n+1}=H_{n}+H_{n-1}+\gamma\) then
+\(H_{n}+\gamma\) obeys the Fibonacci recursion and \(H_{n} = (H_1
+  +\gamma) F_n + (H_{2}-H_{1})F_{n-1} - \gamma\).</li>
+</ul>
+
+<p>
+Let the number of calls to <code>remainder</code> present in \(b_n\) be \(x_n\).
+Then \(x_{n+2} = x_{n+1} + x_n + 1\) and \(x_{1}=0, x_{2}=1\) so by the
+above \(x_n= F_{n}+F_{n-1}-1 = F_{n+1}-1\), and the number of calls to
+<code>remainder</code> is
+</p>
+<ul class="org-ul">
+<li>\(\sum_{i=1}^{n}{x_{i}}+x_{n-1}\)</li>
+<li>(\(\sum_{i=1}^{n}{F_{i+1}}) -n+ F_{n}-1\)</li>
+<li>\(S_{n+1}-F_{n}-n-2\), where \(S\) is the cumulative sum of Fibonacci numbers, \(S_{n}=\sum_{i=0}^{n}{F_i}\).</li>
+</ul>
+
+<p>
+We can express \(S\) in terms of \(F\): from expanding the \(F_{i}\) terms,
+\(S_{n+1} = S_{n}+S_{n-1}+1\) and we have \(S_{1}=1\), \(S_{2}=2\), so
+from the above \(S_{n}=2F_{n}+F_{n-1}-1\) <sup><a id="fnr.1" class="footref" href="#fn.1">1</a></sup>. Using this yields
+\(S_{n+1}+F_{n}=2F_{n+1}+2F_{n}-1=2F_{n+2}-1\).
+</p>
+
+<p>
+The number of calls to <code>remainder</code> is thus \(2F_{n+2}-n-3\)
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">n</td>
+<td class="org-right">1</td>
+<td class="org-right">2</td>
+<td class="org-right">3</td>
+<td class="org-right">4</td>
+<td class="org-right">5</td>
+<td class="org-right">6</td>
+<td class="org-right">7</td>
+</tr>
+
+<tr>
+<td class="org-left">\(F_n\)</td>
+<td class="org-right">1</td>
+<td class="org-right">1</td>
+<td class="org-right">2</td>
+<td class="org-right">3</td>
+<td class="org-right">5</td>
+<td class="org-right">8</td>
+<td class="org-right">13</td>
+</tr>
+
+<tr>
+<td class="org-left">\(x_{n}\)</td>
+<td class="org-right">0</td>
+<td class="org-right">1</td>
+<td class="org-right">2</td>
+<td class="org-right">4</td>
+<td class="org-right">7</td>
+<td class="org-right">11</td>
+<td class="org-right">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">\(2F_{n+2}\)</td>
+<td class="org-right">4</td>
+<td class="org-right">6</td>
+<td class="org-right">10</td>
+<td class="org-right">16</td>
+<td class="org-right">26</td>
+<td class="org-right">&#xa0;</td>
+<td class="org-right">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">\(n+3\)</td>
+<td class="org-right">4</td>
+<td class="org-right">5</td>
+<td class="org-right">6</td>
+<td class="org-right">7</td>
+<td class="org-right">8</td>
+<td class="org-right">&#xa0;</td>
+<td class="org-right">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">calls</td>
+<td class="org-right">0</td>
+<td class="org-right">1</td>
+<td class="org-right">4</td>
+<td class="org-right">9</td>
+<td class="org-right">18</td>
+<td class="org-right">&#xa0;</td>
+<td class="org-right">&#xa0;</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+For the example in the text,
+</p>
+<pre class="example">
+GCD(206,40) = GCD(40,6)
+            = GCD(6,4)
+            = GCD(4,2)
+            = GCD(2,0) = 2
+</pre>
+<p>
+we take \(n=5\) since 5 calls to <code>gcd</code> are needed, hence the number of
+calls to <code>remainder</code> is 18.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org34a1a5b" class="outline-3">
+<h3 id="org34a1a5b">Applicative Order</h3>
+<div class="outline-text-3" id="text-org34a1a5b">
+<p>
+For the example, evaluation using applicative order will make 4 calls
+to <code>remainder</code> since it will make one call each time <code>gcd</code> is called
+after the first.
+</p>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1">1</a></sup> <div class="footpara"><p class="footpara">
+For use on its own, \(S_{n}\) can be rewritten to \(F_{n+2}-1\).
+</p></div></div>
+
+
+</div>
+</div></div>
+<div id="postamble" class="status">
+<p class="author">Author: Jonathan Moore</p>
+<p class="date">Created: 2018-05-06 Sun 18:34</p>
+<p class="validation"></p>
+</div>
+</body>
+</html>
