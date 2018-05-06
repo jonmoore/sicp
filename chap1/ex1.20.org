@@ -1,0 +1,91 @@
+* Exercise 1.20
+
+** Normal order
+
+#+BEGIN_SRC scheme
+(define (gcd a b)
+  (if (= b 0)
+      a
+      (gcd b (remainder a b))))
+#+END_SRC
+
+Assume that the evaluation requires =n= calls to =gcd=.  After
+expansion, the callstack looks like
+#+BEGIN_SRC scheme
+  (if (= b_1 0)
+      a_1
+      (if (= b_2 0)
+          a_2
+          (if (= b_3 0)
+              ;; ...
+              (if (= b_n 0)
+                  a_n
+                  (gcd b_n (remainder a_n b_n)))
+                  ;; ...
+                  )))
+#+END_SRC
+where $a_i$ and $b_i$ are the arguments to the ith call to =gcd=. We
+can simplify this by dropping unevaluated terms and replacing $a_{n}$
+by $b_{n-1}$, taking $b_0 = a_1$.
+#+BEGIN_SRC scheme
+  (if (= b_1 0)
+      (if (= b_2 0)
+          (if (= b_3 0)
+              ;; ...
+              (if (= b_n 0)
+                  b_{n-1} ;; a_n 
+                  ;; ...
+                  )))
+#+END_SRC
+
+The following is useful in summing Fibonacci-like sequences:
+- If a sequence $G$ obeys $G_{n+1}=G_{n}+G_{n-1}$, i.e. the Fibonacci
+  recursion, then it's the solution of a second-order difference
+  equation with a two-dimensional solution space spanned by any two
+  independent solutions, so can assume $G_n = \alpha F_n + \beta
+  F_{n-1}$, hence $G_1 = \alpha, G_2 = \alpha + \beta$, hence $\alpha
+  = G_1, \beta = G_2 - G_1$, hence $G_n = G_1 F_n + (G_2-G_1)
+  F_{n-1}$.
+- If a sequence $H$ obeys $H_{n+1}=H_{n}+H_{n-1}+\gamma$ then
+  $H_{n}+\gamma$ obeys the Fibonacci recursion and $H_{n} = (H_1
+  +\gamma) F_n + (H_{2}-H_{1})F_{n-1} - \gamma$.
+
+Let the number of calls to =remainder= present in $b_n$ be $x_n$.
+Then $x_{n+2} = x_{n+1} + x_n + 1$ and $x_{1}=0, x_{2}=1$ so by the
+above $x_n= F_{n}+F_{n-1}-1 = F_{n+1}-1$, and the number of calls to
+=remainder= is
+- $\sum_{i=1}^{n}{x_{i}}+x_{n-1}$
+- ($\sum_{i=1}^{n}{F_{i+1}}) -n+ F_{n}-1$ 
+- $S_{n+1}-F_{n}-n-2$, where $S$ is the cumulative sum of Fibonacci numbers, $S_{n}=\sum_{i=0}^{n}{F_i}$.
+
+We can express $S$ in terms of $F$: from expanding the $F_{i}$ terms,
+$S_{n+1} = S_{n}+S_{n-1}+1$ and we have $S_{1}=1$, $S_{2}=2$, so
+from the above $S_{n}=2F_{n}+F_{n-1}-1$ [fn:1]. Using this yields
+$S_{n+1}+F_{n}=2F_{n+1}+2F_{n}-1=2F_{n+2}-1$.
+
+The number of calls to =remainder= is thus $2F_{n+2}-n-3$
+
+| n          | 1 | 2 |  3 |  4 |  5 |  6 |  7 |
+| $F_n$      | 1 | 1 |  2 |  3 |  5 |  8 | 13 |
+| $x_{n}$    | 0 | 1 |  2 |  4 |  7 | 11 |    |
+| $2F_{n+2}$ | 4 | 6 | 10 | 16 | 26 |    |    |
+| $n+3$      | 4 | 5 |  6 |  7 |  8 |    |    |
+| calls      | 0 | 1 |  4 |  9 | 18 |    |    |
+
+For the example in the text,
+#+BEGIN_EXAMPLE
+GCD(206,40) = GCD(40,6)
+            = GCD(6,4)
+            = GCD(4,2)
+            = GCD(2,0) = 2
+#+END_EXAMPLE
+we take $n=5$ since 5 calls to =gcd= are needed, hence the number of
+calls to =remainder= is 18.
+
+** Applicative Order
+
+For the example, evaluation using applicative order will make 4 calls
+to =remainder= since it will make one call each time =gcd= is called
+after the first.
+
+[fn:1]  For use on its own, $S_{n}$ can be rewritten to $F_{n+2}-1$.
