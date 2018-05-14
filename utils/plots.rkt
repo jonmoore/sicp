@@ -28,8 +28,6 @@
    (points
     (loglog-points base data))))
 
-(#%require (prefix r/ racket))
-
 (#%provide pairs->plottable)
 (define (pairs->plottable pairs)
   (points (list->r/list pairs)))

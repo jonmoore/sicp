@@ -51,13 +51,12 @@
 
 ;; Generic version of the algorithms we have been looking at
 
-;; ex-1.18
-
 (define (halve x)
   (cond ((even? x) (/ x 2))
         (else 
          (error "can't halve odd " x))))
 
+(#%provide make-fast-combiner-iter)
 (define (make-fast-combiner-iter double combine init)
   (define (iter term n a)
     (cond
@@ -78,30 +77,30 @@
 (define exp-
   (make-fast-combiner-iter (lambda (x) (* x x)) * 1))
 
-(define (zip . lists)
-  (apply map list lists))
-
-(define (tr m) (apply zip m))
-
-(define (dot a b)
-  (sum (map product (zip a b))))
-
 (define (r*m r b)
   (map
    (lambda (col-b)
      (dot r col-b))
-   (tr b)))
+   (transpose b)))
 
 (define (m*m a b)
   (map (lambda (r) (r*m r b)) a))
 
 (define (m*v m v)
-  (r*m v (tr m)))
+  (r*m v (transpose m)))
 
 (define (m^2 m) (m*m m m))
 
 (define (fib- n)
-  (car
+  (cadr
    ((make-fast-combiner-iter m^2 m*v '(1 0))
     '((1 1)(1 0))
     n)))
+
+(module+ test
+  (test-case
+   "fib and fib- match v2"
+   (let ((cases (iota 10)))
+     (check-equal?
+      (map fib cases)
+      (map fib- cases)))))

@@ -73,14 +73,15 @@
            tree)))
 
 (#%require (prefix r/ racket))
+(define (list->r/list-iter accum rest)
+  (if (null? rest)
+      accum
+      (list->r/list-iter (r/cons (car rest) accum) (cdr rest))))
+
 (#%provide list->r/list)
 (define (list->r/list lis)
-  "Map a sicp list to a racket list"
-  (define (iter accum rest)
-    (if (null? rest)
-        accum
-        (iter (r/cons (car rest) accum) (cdr rest))))
-  (iter (r/list) lis))
+;;  "Map a sicp list to a racket list"
+  (list->r/list-iter (r/list) lis))
 
 (#%provide average)
 (define (average x y)
@@ -112,6 +113,85 @@
 (define (sum lis)
   (fold + 0 lis))
 
+(#%provide mean)
+(define (mean lis)
+  (/ (sum lis) (length lis) 1.0))
+
 (#%provide product)
 (define (product lis)
   (fold * 1 lis))
+
+(#%provide transpose)
+(define (transpose m) (apply zip m))
+
+(#%provide dot)
+(define (dot a b)
+  (sum (map product (zip a b))))
+
+
+(#%provide square)
+(define (square x)
+  (* x x))
+
+
+(#%provide estimate-order-gen-data-points)
+(define (estimate-order-gen-data-points fn x0 x-limit y-limit next-x)
+  (define (iter x pairs)
+    (if (> x x-limit)
+        pairs
+        (let ((y (fn x)))
+          (if (> y y-limit)
+              (cons (list x y) pairs)
+              (iter (next-x x)
+                    (cons (list x y) pairs))))))
+  (iter x0 '()))
+
+(#%provide estimate-order-ex)
+(define (estimate-order-ex fn x0 x-limit y-limit next-x)
+  (define (dataf->order dataf)
+    (let* ((samples (take dataf 2))
+           (x1 (car (cadr samples)))
+           (y1 (cadr (cadr samples)))
+           (x2 (car (car samples)))
+           (y2 (cadr (car samples))))
+      (/ (- (log y1) (log y2))
+         (- (log x1) (log x2)))))
+  (let* ((data (estimate-order-gen-data-points fn x0 x-limit y-limit next-x))
+         (dataf (map-tree exact->inexact data)))
+    (dataf->order dataf)))
+
+(#%provide estimate-order)
+(define (estimate-order fn x0 x-limit y-limit)
+  (define (next-x x)
+    (floor (* 1.2 x)))
+  (estimate-order-ex fn x0 x-limit y-limit next-x))
+
+(#%provide and-proc)
+(define (and-proc . lis)
+  (every values lis))
+
+(module+ test
+  (define (id x) x)
+  (test-case
+   "testing and-proc"
+   (check-equal? #t (and-proc))
+   (check-equal? 1 (and-proc 2 1))
+   (check-equal? #f (and-proc 2 #f 1))))
+
+(#%provide or-proc)
+(define (or-proc . lis)
+  (any values lis))
+
+(module+ test
+  (test-case
+   "testing or-proc"
+   (check-equal? #f (or-proc))
+   (check-equal? 2 (or-proc 2 1))
+   (check-equal? 2 (or-proc #f 2 1))
+   (check-equal? #t (or-proc #t 2 1))))
+
+(#%provide add)
+(define (add x)
+  (lambda (y)
+    (+ x y)))
+

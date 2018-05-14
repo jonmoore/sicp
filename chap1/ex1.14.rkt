@@ -159,30 +159,6 @@
   (> (cc-run-time cc-datum) min-time))
 
 (module+ main
-  (define (data-points fn x0 x-limit y-limit)
-    (define (next-x x) (floor (* 1.2 x)))
-    (define (iter x pairs)
-      (if (> x x-limit)
-          pairs
-          (let ((y (fn x)))
-            (if (> y y-limit)
-                (cons (list x y) pairs)
-                (iter (next-x x)
-                      (cons (list x y) pairs))))))
-    (iter x0 '()))
-
-  (define (estimate-order fn x0 x-limit y-limit)
-    (define (dataf->order dataf)
-      (let* ((largest2 (take dataf 2))
-             (x1 (car (cadr largest2)))
-             (y1 (cadr (cadr largest2)))
-             (x2 (car (car largest2)))
-             (y2 (cadr (car largest2))))
-        (/ (- (log y1) (log y2))
-           (- (log x1) (log x2)))))
-    (let* ((data (data-points fn x0 x-limit y-limit))
-           (dataf (map-tree exact->inexact data)))
-      (dataf->order dataf)))
 
   (define (counters-for-kinds kind-list cc-fn)
     (map (lambda (kinds)
@@ -206,7 +182,7 @@
     (map-tree exact->inexact
               (map
                (lambda (fn)
-                 (data-points fn x0 x-limit y-limit))
+                 (estimate-order-gen-data-points fn x0 x-limit y-limit))
                fns)))
 
   (define (plot-growth-in fns x0 x-limit y-limit)
