@@ -64,8 +64,6 @@
 ;; apply :: M[a->b]->M[a]->M[b]
 ;; apply = flip apply1
 
-;; Back to SICP, using the above for some timing machinery 
-;;
 ;; repeated use of apply as above can handle multiple arguments.
 ;; M[a->b->c]->M[a]->M[b->c]
 ;; M[a->b->c]->M[a]->M[b]->M[c]
