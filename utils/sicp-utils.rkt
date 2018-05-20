@@ -195,3 +195,27 @@
   (lambda (y)
     (+ x y)))
 
+(#%provide diff)
+(define (diff xs)
+  (srfi-map - (cdr xs) xs))
+
+(#%provide partial-sums)
+(define (partial-sums xs)
+  (reverse
+   (fold
+    (lambda (el accum)
+      (cons (+ el (car accum)) accum))
+    '(0)
+    xs)))
+
+(module+ test
+  (test-case
+   "diff of partial-sums is the identity"
+   (for-each
+    (lambda (lis)
+      (with-check-info
+       (('lis lis))
+       (check-equal?
+        (diff (partial-sums lis))
+        lis)))
+    (map (lambda (n) (iota n 3 2)) (iota 5)))))
