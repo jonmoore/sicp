@@ -6,25 +6,25 @@
 # from the corresponding .rkt file.
 #
 .PHONY: default raco_make test clean
-default: test
+default: build
 
 # Find all the .rkt files using rackunit (the test is not exact) in
 # RKT_DIRS
-RKT_DIRS := test-approaches chap1
+RKT_DIRS := test-approaches chap1 utils
 FIND_TEST_FILES=$(shell cmd /c "findstr /m /s rackunit  $(rkt_dir)\*.rkt")
 RKT_TEST_FILES := $(foreach rkt_dir, $(RKT_DIRS), $(FIND_TEST_FILES))
 
 ZO_FILES := $(join $(patsubst %, %compiled\, $(dir $(RKT_TEST_FILES))), \
 		  $(patsubst %.rkt, %_rkt.zo, $(notdir $(RKT_TEST_FILES))))
 
-raco_make:
+build:
 	@raco make -j 4 $(RKT_TEST_FILES)
 
 raco_test.dummy: $(ZO_FILES)
-	raco test -j 4 -q -x $(subst \compiled,,$(?:_rkt.zo=.rkt))
+	raco test -j 4 -t -q -x $(subst \compiled,,$(?:_rkt.zo=.rkt))
 	@echo testing_done > raco_test.dummy
 
-test: raco_make raco_test.dummy
+test: build raco_test.dummy
 
 clean:
 	del /s *.zo
