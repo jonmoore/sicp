@@ -2,6 +2,11 @@
 (#%require (only racket module+ format) rackunit racket/trace)
 (#%require "../utils/sicp-utils.rkt" "../utils/srfi-1.rkt")
 
+(define (gcd a b)
+  (if (= b 0)
+      a
+      (gcd b (remainder a b))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ex 1.21
 (define (divides? a b)
