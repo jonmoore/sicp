@@ -62,8 +62,14 @@
 
 (#%provide constant)
 (define (constant x)
-  (lambda () x))
+  ;; Variadic function always returning x
+  (lambda args x))
 
+(module+ test
+  (test-case
+   "constant"
+   (check-equal? ((constant 1.0)) 1.0)
+   (check-equal? ((constant 1.0) #f) 1.0)))
 
 (#%provide map-tree)
 (define (map-tree f tree)
