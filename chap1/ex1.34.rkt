@@ -16,6 +16,7 @@
 (define (close-enough? v1 v2)
   (< (abs (- v1 v2)) tolerance))
 
+(#%provide fixed-point-ex)
 (define (fixed-point-ex f guess test)
   (define (iter guess)
     (let ((next (f guess)))
@@ -24,6 +25,7 @@
           (iter next))))
   (iter guess))
 
+(#%provide fixed-point)
 (define (fixed-point f guess)
   (fixed-point-ex f guess close-enough?))
 
