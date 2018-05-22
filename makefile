@@ -10,7 +10,7 @@ default: build
 
 # Find all the .rkt files using rackunit (the test is not exact) in
 # RKT_DIRS
-RKT_DIRS := test-approaches chap1 utils
+RKT_DIRS := test-approaches chap1 chap2 utils
 FIND_TEST_FILES=$(shell cmd /c "findstr /m /s rackunit  $(rkt_dir)\*.rkt")
 RKT_TEST_FILES := $(foreach rkt_dir, $(RKT_DIRS), $(FIND_TEST_FILES))
 
