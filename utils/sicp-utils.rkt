@@ -10,6 +10,10 @@
 (#%require "srfi-1.rkt")
 (print-mpair-curly-braces #f)
 
+(#%provide identity)
+(define (identity . args)
+  (apply values args))
+
 (#%provide disp)
 (define (disp text)
   (display text (current-output-port)))
@@ -139,6 +143,12 @@
 (define (square x)
   (* x x))
 
+(#%provide sgn)
+(define (sgn x)
+  (cond ((positive? x) 1)
+        ((negative? x) -1)
+        ((zero? x) 0)
+        (else (error "expected a number"))))
 
 (#%provide estimate-order-gen-data-points)
 (define (estimate-order-gen-data-points fn x0 x-limit y-limit next-x)
@@ -225,3 +235,8 @@
         (diff (partial-sums lis))
         lis)))
     (map (lambda (n) (iota n 3 2)) (iota 5)))))
+
+(#%provide compose)
+(define (compose f g)
+  (lambda (x)
+    (f (g x))))
