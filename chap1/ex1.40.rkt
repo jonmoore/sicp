@@ -40,6 +40,8 @@
 
 ;; (((double (double double)) inc) 5)
 
+;; (((double double) inc) 5)
+
 ;; First (deliberately simplistic) approach -- expand mechanically.
 ;;
 ;; (double (double double))
