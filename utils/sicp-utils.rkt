@@ -23,6 +23,11 @@
   (disp text)
   (newline))
 
+(#%provide displn-eval)
+(define (displn-eval expr ns)
+  (displn expr)
+  (displn (eval expr ns)))
+
 (#%provide begin-example)
 (define (begin-example text)
   (newline)
