@@ -8,6 +8,7 @@
 .PHONY: default raco_make test clean
 default: build
 
+
 # Find all the .rkt files using rackunit (the test is not exact) in
 # RKT_DIRS
 RKT_DIRS := test-approaches chap1 chap2 utils
@@ -17,6 +18,8 @@ RKT_TEST_FILES := $(foreach rkt_dir, $(RKT_DIRS), $(FIND_TEST_FILES))
 ZO_FILES := $(join $(patsubst %, %compiled\, $(dir $(RKT_TEST_FILES))), \
 		  $(patsubst %.rkt, %_rkt.zo, $(notdir $(RKT_TEST_FILES))))
 
+# TODO - fix to make work with large numbers of files.  Currently this
+# command overflows a 1024 char limit.
 build:
 	@raco make -j 4 $(RKT_TEST_FILES)
 
