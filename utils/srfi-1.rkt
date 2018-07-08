@@ -347,6 +347,19 @@
                (filter pred (cdr list))))
         (else (filter pred (cdr list)))))
 
+;; https://srfi.schemers.org/srfi-1/srfi-1.html#partition
+(#%provide partition)
+(define (partition pred list)
+  (if (null? list)
+      (values nil nil)
+      (call-with-values
+          (lambda ()
+            (partition pred (cdr list)))
+        (lambda (in-rest out-rest)
+          (if (pred (car list))
+              (values (cons (car list) in-rest) out-rest)
+              (values in-rest (cons (car list) out-rest)))))))
+
 (module+ test
   (test-case
    "filter on empty list"
@@ -409,6 +422,16 @@
                  1)
    (check-equal? (every values '(2 #f 1))
                  #f)))
+
+;; https://srfi.schemers.org/srfi-1/srfi-1.html#take-while
+(#%provide take-while)
+(define (take-while pred clist)
+  (if (null? clist)
+      '()
+      (if (pred (car clist))
+          (cons (car clist)
+                (take-while pred (cdr clist)))
+          '())))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

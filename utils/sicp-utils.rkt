@@ -245,3 +245,6 @@
 (define (compose f g)
   (lambda (x)
     (f (g x))))
+
+;; (#%provide partition-cons)
+;; (define (partition-cons pred list)
