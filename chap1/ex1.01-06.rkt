@@ -1,5 +1,5 @@
 #lang sicp
-(#%require racket rackunit "../utils/sicp-utils.rkt")
+(#%require (only racket module+ printf) rackunit "../utils/sicp-utils.rkt")
 
 ;; ex-1.1
 (module+ main

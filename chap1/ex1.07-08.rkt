@@ -1,5 +1,5 @@
 #lang sicp
-(#%require racket rackunit "../utils/sicp-utils.rkt")
+(#%require (only racket module+) rackunit "../utils/sicp-utils.rkt")
 
 ;; ex 1.7
 (define (sqrt x)
@@ -87,5 +87,5 @@
       (check-= (/ (cube (cubert (- x))) (- x)) 1 test-tol))
     test-nums)))
 
-(provide cubert)
+(#%provide cubert)
  

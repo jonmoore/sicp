@@ -159,6 +159,11 @@
    "append/drop-right/take-right"
    (partition-check drop-right take-right (iota 10))))
 
+;; https://srfi.schemers.org/srfi-1/srfi-1.html#concatenate
+(#%provide concatenate)
+(define (concatenate lists)
+  (apply append lists))
+
 ;; https://srfi.schemers.org/srfi-1/srfi-1.html#reverse
 (#%provide reverse)
 (define (reverse l)
@@ -172,6 +177,22 @@
       (check-equal?
        (reverse (iota n))
        (iota n (dec n) -1)))
+    (iota 5))))
+
+;; https://srfi.schemers.org/srfi-1/srfi-1.html#append-reverse
+(#%provide append-reverse)
+(define (append-reverse rev-head tail)
+  (if (null? rev-head)
+      tail
+      (append-reverse (cdr rev-head) (cons (car rev-head) tail))))
+
+(module+ test
+  (test-case
+   "append-reverse vs. definition"
+   (for-each
+    (lambda (n)
+      (check-equal? (append-reverse (iota n) (iota 3))
+                    (append (reverse (iota n)) (iota 3))))
     (iota 5))))
 
 ;; https://srfi.schemers.org/srfi-1/srfi-1.html#zip
@@ -266,6 +287,42 @@
       knil
       (fold kcons (kcons (car list) knil) (cdr list))))
 
+
+;; https://srfi.schemers.org/srfi-1/srfi-1.html#unfold
+(#%provide unfold)
+(define (unfold p f g seed . args)
+  (define tail-gen (-list-ref-safe args 0 (lambda (x) '())))
+  (define (recur seed)
+    (if (p seed)
+        (tail-gen seed)
+        (cons (f seed)
+              (recur (g seed)))))
+  (recur seed))
+
+(module+ test
+  (test-case
+   "unfold as list copying"
+   (for-each
+    (lambda (lis)
+      (with-check-info
+       (('lis lis))
+       (check-equal?
+        (unfold null? car cdr lis)
+        lis)))
+    (map iota (iota 5))))
+
+  (test-case
+   "unfold as append"
+   (for-each
+    (lambda (head)
+      (with-check-info
+       (('head head))
+       (let ((tail '(#t 23)))
+         (check-equal?
+          (unfold null? car cdr head (lambda (x) tail))
+          (append head tail)))))
+    (map iota (iota 5)))))
+
 ;; https://srfi.schemers.org/srfi-1/srfi-1.html#fold-right 
 (#%provide fold-right)
 (define (fold-right kcons knil . lists)
@@ -302,40 +359,10 @@
                       (list (recur (map cdr lists)))))))
   (recur lists))
 
-;; https://srfi.schemers.org/srfi-1/srfi-1.html#unfold
-(#%provide unfold)
-(define (unfold p f g seed . args)
-  (define tail-gen (-list-ref-safe args 0 (lambda (x) '())))
-  (define (recur seed)
-    (if (p seed)
-        (tail-gen seed)
-        (cons (f seed)
-              (recur (g seed)))))
-  (recur seed))
-
-(module+ test
-  (test-case
-   "unfold as list copying"
-   (for-each
-    (lambda (lis)
-      (with-check-info
-       (('lis lis))
-       (check-equal?
-        (unfold null? car cdr lis)
-        lis)))
-    (map iota (iota 5))))
-
-  (test-case
-   "unfold as append"
-   (for-each
-    (lambda (head)
-      (with-check-info
-       (('head head))
-       (let ((tail '(#t 23)))
-         (check-equal?
-          (unfold null? car cdr head (lambda (x) tail))
-          (append head tail)))))
-    (map iota (iota 5)))))
+;; https://srfi.schemers.org/srfi-1/srfi-1.html#append-map
+(#%provide append-map)
+(define (append-map f . clists)
+  (apply append (apply map f clists)))
 
 ;;; https://srfi.schemers.org/srfi-1/srfi-1.html#FilteringPartitioning
 ;; https://srfi.schemers.org/srfi-1/srfi-1.html#filter
@@ -377,6 +404,23 @@
     (iota 10))))
 
 ;;; https://srfi.schemers.org/srfi-1/srfi-1.html#Searching
+;; https://srfi.schemers.org/srfi-1/srfi-1.html#member
+
+;;https://srfi.schemers.org/srfi-1/srfi-1.html#find-tail
+(#%provide find-tail)
+(define (find-tail pred clist)
+  (cond ((null? clist) #f)
+        ((pred (car clist)) clist)
+        (else (find-tail pred (cdr clist)))))
+
+(module+ test
+  (test-case
+   "testing find-tail"
+   (check-equal? (find-tail even? '(3 1 37 -8 -5 0 0))
+                 '(-8 -5 0 0))
+   (check-equal? (find-tail even? '(3 1 37 -5))
+                 #f)))
+
 ;; https://srfi.schemers.org/srfi-1/srfi-1.html#any
 (#%provide any)
 (define (any pred . lists)

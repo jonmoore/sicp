@@ -32,6 +32,8 @@ source file contents.
     the multiple-directory structure by
     - making better use of make's string functions, or
     - running make multiple times from a wrapper script
+
+
   - [ ] Make the final test target depend on separate tests per zo file.
     Current behavior is correct but runs more tests than needed because each
     updated module is retested until all the tests pass.

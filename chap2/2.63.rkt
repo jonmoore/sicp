@@ -211,14 +211,15 @@
                ns))
 
 
-(define (lookup wanted-key records)
-  ;; based on element-of-set?
-  ;; assumes the existence of a record-key function for an element
-  (cond ((null? records) (error "key not found" wanted-key))
-        (else (let ((cur-key (record-key (entry records))))
-                (cond 
-                 ((= wanted-key cur-key) (entry records))
-                 ((< wanted-key cur-key)
-                  (lookup wanted-key (left-branch records)))
-                 ((> wanted-key cur-key)
-                  (lookup wanted-key (right-branch records))))))))
+;; (define (lookup wanted-key records)
+;;   ;; based on element-of-set?
+;;   ;; assumes the existence of a record-key function for an element
+;;   (cond ((null? records) (error "key not found" wanted-key))
+;;         (else (let ((cur-key (record-key (entry records))))
+;;                 (cond 
+;;                  ((= wanted-key cur-key) (entry records))
+;;                  ((< wanted-key cur-key)
+;;                   (lookup wanted-key (left-branch records)))
+;;                  ((> wanted-key cur-key)
+;;                   (lookup wanted-key (right-branch records))))))))
+

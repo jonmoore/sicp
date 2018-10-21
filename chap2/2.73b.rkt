@@ -4,6 +4,34 @@
 (define-namespace-anchor a)
 (define ns (namespace-anchor->namespace a))
 
+(define (attach-tag type-tag contents)
+  (cons type-tag contents))
+
+(define (put sym types func)
+  (error "put not implemented")
+  )
+
+(define (get a b)
+  (error "get not implemented"))
+
+(define (variable x)
+  (error "variable not implemented"))
+
+(define (same-variable? x y)
+  (error "variable not implemented"))
+
+
+(define (type-tag datum)
+  (if (pair? datum)
+      (car datum)
+      (error "bad tagged datum -- TYPE-TAG" datum)))
+
+(define (contents datum)
+  (if (pair? datum)
+      (cdr datum)
+      (error "bad tagged datum -- TYPE-TAG" datum)))
+
+
 (define (install-rectangular-package)
   ;; rectangular representation
   (define (real-part z) (car z))
@@ -82,7 +110,7 @@
   (cond ((number? exp) 0)
         ((variable exp) (if (same-variable? exp var) 1 0))
         (else ((get 'deriv (operator exp))
-               (operands exp) var))))
+               (operand exp) var))))
 
 (define (operator exp) (car exp))
 (define (operand exp) (cdr exp))

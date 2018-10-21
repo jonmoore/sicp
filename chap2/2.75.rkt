@@ -1,3 +1,9 @@
+#lang sicp
+(#%require (only racket module+ define-namespace-anchor namespace-anchor->namespace) rackunit racket/trace)
+(#%require "../utils/sicp-utils.rkt" "../utils/srfi-1.rkt")
+(define-namespace-anchor a)
+(define ns (namespace-anchor->namespace a))
+
 
 (define (make-from-mag-angle r a)
   (define (dispatch op)

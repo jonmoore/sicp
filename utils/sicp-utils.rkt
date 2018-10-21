@@ -10,9 +10,9 @@
 (#%require "srfi-1.rkt")
 (print-mpair-curly-braces #f)
 
-(#%provide identity)
-(define (identity . args)
-  (apply values args))
+;; (#%provide identity)
+;; (define (identity . args)
+;;   (apply values args))
 
 (#%provide disp)
 (define (disp text)
@@ -215,6 +215,12 @@
 (define (add x)
   (lambda (y)
     (+ x y)))
+
+;; (#%provide gcd)
+;; (define (gcd a b)
+;;   (if (= b 0)
+;;       a
+;;       (gcd b (remainder a b))))
 
 (#%provide diff)
 (define (diff xs)
