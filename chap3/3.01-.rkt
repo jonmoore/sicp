@@ -223,3 +223,198 @@
      (check-equal? ((pa2 'sesame 'withdraw) 40) 60)
      )))
 
+
+;; random-number generation
+;; ========================
+;;
+;; Linear Congruential Sequences
+;;
+;; http://www.wilbaden.com/neil_bawd/lincongs.html, based on Knuth
+
+;;
+;; X[n+1] = (a*X[n] + c) mod m
+;;
+
+;; - m, the modulus; 0 < m. 
+
+;; - a, the multiplier; 0 <= a < m. 
+
+;; - c, the increment; 0 <= c < m. 
+
+;; - X[0], the starting value; 0 <= X[0] < m. 
+
+;;
+;; i. The "seed" number X[0] may be chosen arbitrarily. 
+
+;; ii. The modulus m should be large, say at least 2^30. Conveniently
+;; it may be the computer's word size, since that makes the
+;; computation quite efficient.
+
+;; iii. If m is a power of 2, pick a so that a mod 8 is 5. If m is a
+;; power of 10, choose a so that a mod 200 is 21.
+
+;; iv. The multiplier a should preferably be chosen between .01*m and
+;; .99*m, and its binary or decimal digits should not have a simple,
+;; regular pattern ... Knuth recommends a "haphazard" constant like
+;; 3_141_592_621.
+
+;; v. The value of the increment c is immaterial when a is a good
+;; multiplier, except that c must have no factor in common with m.  So
+;; 1 looks like a good value for c.
+
+;; vii. The randomness in t dimensions is only one part in the t-th
+;; root of m.
+
+;; viii. At most m/1000 numbers should be generated; otherwise the
+;; future will behave more and more like the past.
+
+
+;; "EASY-RAND was nominated by George Marsaglia, 1972, as a candidate
+;; for the best multiplier, perhaps because 69069 is easy to remember."
+
+;;    : EASY-RAND-NEXT  ( -- 0..4294967295 )
+;;       RAND-X @
+;;          69069 * 1+
+;;       DUP RAND-NEXT ! ;
+
+;; The above is in the stack-based language FORTH. The ":" begins the
+;; definition of EASY-RAND-NEXT and the ";" ends it.  The "!" assigns,
+;; binding the preceding symbol.
+;;
+;; It implements the recurrence 
+;;
+;; X[n+1] = (a*X[n] + c) mod m
+;; 
+;; with multiplier a as 69096, increment c as 1 and modulus m as 2^32.
+;; the modulus operation is presumably implicitly applied because of
+;; an assumption about the behavior of * in the FORTH runtime.
+;;
+;; Execution example, showing the stack evolution
+;; X[0]
+;; 69069 X[0]
+;; (* 69069 X[0])
+;; (modulo (+ (* 69069 X[0]) 1) 2^32)
+;; ;; call this X[1]
+;; X[1] X[1] ;; after dup
+;; X[1] ;; after the dup'ed value is read/consumed
+
+;; Other examples at the link use FORTH's */mod
+
+;; http://lars.nocrew.org/forth2012/core/TimesDivMOD.html
+;;
+;; /MODstar-slash-mod
+;;
+;;   ( n1 n2 n3 -- n4 n5 )
+;;
+;; Multiply n1 by n2 producing the intermediate double-cell result
+;; d. Divide d by n3 producing the single-cell remainder n4 and the
+;; single-cell quotient n5. An ambiguous condition exists if n3 is
+;; zero, or if the quotient n5 lies outside the range of a single-cell
+;; signed integer. If d and n3 differ in sign, the
+;; implementation-defined result returned will be the same as that
+;; returned by either the phrase >R M* R> FM/MOD or the phrase >R M*
+;; R> SM/REM.
+
+;; (define random
+;;   (let ((a 69069) (c 1) (m (expt 2 32)) (seed 19380110))
+;;     (lambda new-seed
+;;       (if (pair? new-seed)
+;;           (set! seed (car new-seed))
+;;           (set! seed (modulo (+ (* seed a) c) m)))
+;;       (/ seed m))))
+
+;; 
+(define (make-rand random-init rand-update)
+  (let ((x random-init))
+    (lambda ()
+      (set! x (rand-update x))
+      x)))
+
+(define (lcg a c m)
+  (lambda (x)
+    (modulo (+ (* x a) c) m)))
+
+(define lcg-easy-rand
+  (lcg 69069 1 (expt 2 32)))
+
+(define (estimate-pi trials)
+  (sqrt (/ 6 (monte-carlo trials cesaro-test))))
+
+(define (cesaro-test)
+  (= (gcd (random) (random)) 1))
+
+(define (monte-carlo trials experiment)
+  (define (iter trials-remaining trials-passed)
+    (cond ((= trials-remaining 0)
+           (* 1.0 (/ trials-passed trials)))
+          ((experiment)
+           (iter (- trials-remaining 1)
+                 (+ trials-passed 1)))
+          (else
+           (iter (- trials-remaining 1)
+                 trials-passed))))
+  (iter trials 0))
+
+(define (random-in-range low high)
+  (let ((range (- high low)))
+    (+ low (random range))))
+
+(define random-init 1)
+(define easy-rand
+  (make-rand random-init lcg-easy-rand))
+
+(define (random-float-in-range low high)
+  (let ((easy-rand-mod (expt 2 32))
+        (sample (easy-rand))
+        (range (- high low)))
+    (+ low (* 1.0 range (/ sample easy-rand-mod)))))
+  
+(define (estimate-integral P x1 x2 y1 y2)
+  (let ((integral-experiment
+         (lambda ()
+           (P (random-float-in-range x1 x2)
+              (random-float-in-range y1 y2))))
+        (area (* (- x2 x1) (- y2 y1))))
+    (* (monte-carlo 1000 integral-experiment)
+       area)))
+
+(define (in-unit-circle x y) (< (+ (* x x) (* y y)) 1))
+
+(module+ test
+  (begin-example "3.5, Monte Carlo integral")
+  (test-case
+   "area of unit circle"
+   (check-= (estimate-integral in-unit-circle -1 1 -1 1)
+            (* 4 (atan 1.0)) ;; pi
+            0.05))
+  (test-case
+   "integral of x*2 from 0 to 1"
+   (check-= (estimate-integral (lambda (x y) (< y (* x x))) 0 1 0 1)
+            (/ 1.0 3.0)
+            0.03)))
+
+(define (make-resettable-rand rand-init rand-update)
+  (let ((cur-rand (make-rand rand-init rand-update)))
+    (lambda (sym)
+      (cond
+       ((eq? sym 'generate)
+        (cur-rand))
+       ((eq? sym 'reset)
+        (lambda (new-init)
+          (set! cur-rand (make-rand new-init rand-update))))
+       (else
+        (error "-- MAKE-RESETTABLE-RAND: unrecognized symbol" sym ))))))
+
+(module+ test
+  (begin-example "3.6, resettable-rand")
+  (test-case
+   "resettable rand"
+   (define rer1 (make-resettable-rand 1 lcg-easy-rand))
+   (define rer2 (make-resettable-rand 1 lcg-easy-rand))
+   (check-equal? (rer1 'generate) 69070)
+   (check-equal? (rer2 'generate) 69070)
+   (check-equal? (rer1 'generate) 475628535)
+   ((rer1 'reset) 1)
+   ;; check it only resets rer1
+   (check-equal? (rer1 'generate) 69070)
+   (check-equal? (rer2 'generate) 475628535)))
