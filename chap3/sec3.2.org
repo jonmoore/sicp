@@ -1,0 +1,179 @@
+
+* Exercise 3.9
+
+#+BEGIN_SRC scheme :eval no
+(define (factorial n)
+  (if (= n 1)
+      1
+      (* n (factorial (- n 1)))))
+#+END_SRC
+
+
+#+begin_src plantuml :file exercise3.9a.png
+  scale 2.0
+  title Exercise 3.9a - recursive form
+
+  namespace global {
+  
+  class factorial << (S, gray) >> {
+  }
+  
+  }
+  class proc << (L, green) >> {
+  n
+  }  
+  note bottom of proc 
+  (if (= n 1)
+      1
+      (* n (factorial (- n 1))))
+  end note
+  
+  proc -> global : scoped >
+  global.factorial -> proc
+
+  ' Create a namespace to evaluate fact 6
+  namespace fact6 {
+  class bindings << (B, green) >> {
+  n : 6
+  }
+  }
+  fact6 -> global
+  note bottom of fact6
+  (if (= n 1)
+      1
+      (* n (factorial (- n 1))))
+  end note
+  
+  ' Create a namespace to evaluate fact 6
+  namespace fact5 {
+  class bindings << (B, green) >> {
+  n : 5
+  }
+  }
+  fact5 -> global
+  note bottom of fact5
+  (if (= n 1)
+      1
+      (* n (factorial (- n 1))))
+  end note
+  
+  
+#+end_src
+
+#+RESULTS:
+[[file:exercise3.9a.png]]
+
+#+BEGIN_SRC scheme :eval no
+
+(define (factorial n)
+  (fact-iter 1 1 n))
+
+(define (fact-iter product 
+                   counter 
+                   max-count)
+  (if (> counter max-count)
+      product
+      (fact-iter (* counter product)
+                 (+ counter 1)
+                 max-count)))
+
+#+END_SRC
+
+#+begin_src plantuml :file exercise3.9b.png
+  scale 2.0
+  title Exercise 3.9b - iterative form
+
+  namespace global {
+      class factorial << (S, gray) >>
+      class factiter << (S, gray) >>
+  }
+
+  class proc_factorial << (L, green) >> {
+  n
+  }  
+  note bottom of proc_factorial 
+    (fact-iter 1 1 n)
+  end note
+  proc_factorial -> global : scoped >
+  global.factorial -> proc_factorial
+
+  class proc_factiter << (L, green) >> {
+  product
+  counter
+  max-count
+  }  
+  note bottom of proc_factiter 
+  (if (> counter max-count)
+      product
+      (fact-iter (* counter product)
+                 (+ counter 1)
+                 max-count))
+  end note
+  proc_factiter -> global : scoped >
+  global.factiter -> proc_factiter
+
+  ' Create a namespace to evaluate fact 6
+  
+  namespace fact6 {
+  class bindings << (B, green) >> {
+  n : 6
+  }
+  }
+  fact6 -> global
+  note bottom of fact6
+    (fact-iter 1 1 n)
+  end note
+
+  namespace factiter116 {
+  class bindings << (B, green) >> {
+  product : 1
+  counter : 1
+  max-count : 6
+  }
+  }
+  factiter116 -> global
+  note bottom of factiter116
+  (if (> counter max-count)
+      product
+      (fact-iter (* counter product)
+                 (+ counter 1)
+                 max-count))
+  end note
+
+  namespace factiter126 {
+  class bindings << (B, green) >> {
+  product : 1
+  counter : 2
+  max-count : 6
+  }
+  }
+  factiter126 -> global
+  note bottom of factiter126
+  (if (> counter max-count)
+      product
+      (fact-iter (* counter product)
+                 (+ counter 1)
+                 max-count))
+  end note
+
+  namespace factiter236 {
+  class bindings << (B, green) >> {
+  product : 2
+  counter : 3
+  max-count : 6
+  }
+  }
+  factiter236 -> global
+  note bottom of factiter236
+  (if (> counter max-count)
+      product
+      (fact-iter (* counter product)
+                 (+ counter 1)
+                 max-count))
+  end note
+
+#+end_src
+
+#+RESULTS:
+[[file:exercise3.9b.png]]
+
