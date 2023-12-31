@@ -1,12 +1,80 @@
 # sicp  -*- fill-column: 70; -*-
 
 * Intro
+
 SICP exercises and related code
 
-* rackunit test directories
+* How-to
 
-These directories show different ways of testing code in Racket.  The
-pattern used in rackunit7 fits our needs well.
+*** Set up
+
+    GNU Make 4.2 or later installed and on PATH
+
+    Racket 6.11 or later installed
+
+    The script ~setup.bat~ can be used to set up some basic
+    environment variables and keybindings.
+
+*** Build
+#+BEGIN_SRC
+make build
+#+END_SRC
+*** Run tests
+All tests:
+#+BEGIN_SRC
+make build test
+#+END_SRC
+
+Tests for a given chapter:
+#+BEGIN_SRC
+make chap3 test
+#+END_SRC
+
+Test just a given section of exercises
+#+BEGIN_SRC
+raco test -t chap3\sect3.3.rkt
+#+END_SRC
+
+* Gotchas
+*** Avoiding use of ~racket~ definitions brought in by require
+
+  Whenever we ~require~ or ~#%require~ ~racket~ as below,
+  : (#%require racket rackunit)
+  this brings Racket's definitions into scope which is liable to cause
+  conflicts with sicp definitions (e.g. the types of lists will not
+  match).
+
+  To avoid this we can use the options below.
+
+***** use ~only~ or ~only-in~ to restrict the imported definitions
+
+        #+BEGIN_SRC scheme
+  (#%require  (only racket module+))
+        #+END_SRC
+
+        #+BEGIN_SRC scheme
+  (require  (only-in racket module+))
+        #+END_SRC
+
+        For reference see:
+        - [[https://docs.racket-lang.org/reference/require.html][documentation for "require"]], which includes
+        - [[https://docs.racket-lang.org/reference/require.html#%2528form._%2528%2528quote._~23~25kernel%2529._~23~25require%2529%2529][documentation for #%require]]
+
+***** make definitions in a ~sicp~ sub-module
+  #+BEGIN_SRC scheme
+  (module inner sicp
+    (define baz 1)
+    (#%provide baz))
+  (require 'inner)
+  #+END_SRC
+
+***** make definitions in a ~#lang sicp~ file
+
+* Testing design
+
+The directories under test-approaches named below different ways of
+testing code in Racket.  The pattern used in rackunit7 fits our needs
+well.
 
 *** rackunit1
 - =sicp2-module-with-test-module.rkt=
@@ -86,37 +154,3 @@ sub-modules) as needed
 An improved version of rackunit5, based on the approach in rackunit6,
 i.e. using ~#%require~ with ~only~ to avoid bringing unwanted racket
 definitions into scope.
-
-* Avoiding use of ~racket~ definitions
-
-Whenever we ~require~ or ~#%require~ ~racket~ as below,
-: (#%require racket rackunit)
-this brings Racket's definitions into scope which is liable to cause
-conflicts with sicp definitions (e.g. the types of lists will not
-match).
-
-To avoid this we can use the options below.
-
-*** use ~only~ or ~only-in~ to restrict the imported definitions
-
-      #+BEGIN_SRC scheme
-(#%require  (only racket module+))
-      #+END_SRC
-
-      #+BEGIN_SRC scheme
-(require  (only-in racket module+))
-      #+END_SRC
-
-      For reference see:
-      - [[https://docs.racket-lang.org/reference/require.html][documentation for "require"]], which includes
-      - [[https://docs.racket-lang.org/reference/require.html#%2528form._%2528%2528quote._~23~25kernel%2529._~23~25require%2529%2529][documentation for #%require]]
-
-*** make definitions in a ~sicp~ sub-module
-#+BEGIN_SRC scheme
-(module inner sicp
-  (define baz 1)
-  (#%provide baz))
-(require 'inner)
-#+END_SRC
-
-*** make definitions in a ~#lang sicp~ file

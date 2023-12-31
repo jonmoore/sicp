@@ -18,3 +18,5 @@
 *raco_make.err
 *raco_make.out
 
+/chap3/*.png
+

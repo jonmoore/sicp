@@ -44,7 +44,6 @@ source file contents.
   - Paul Smith's approach to multi-architecture builds; heavier than this needs
   - guile chdir; too magical/requires new-ish make
 
-
 * raco make updating
     
   Conclusions:
