@@ -1,8 +1,9 @@
 #lang sicp
 
-(#%require (only racket module+) rackunit)
+(#%require (only racket module+ keyword-apply) rackunit)
 (#%require plot)
 (#%require "../utils/srfi-1.rkt" "../utils/sicp-utils.rkt" "../utils/plots.rkt")
+(#%require debug/repl)
 
 ;; ex-1.14
 ;; from the text
@@ -166,6 +167,7 @@
              (cc-fn amount kinds)))
          kind-list))
 
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;; display how estimated order of growth varies by number of kinds
   (let* ((kinds-list '(2 3 4 5))
          (cc-cached (cc-cached-for 5)))
@@ -177,41 +179,60 @@
       (lambda (counter)
         (estimate-order counter 100 1000 50000))
       (counters-for-kinds kinds-list cc-cached))))
-  
-  (define (growth-results fns x0 x-limit y-limit)
-    (map-tree exact->inexact
-              (map
-               (lambda (fn)
-                 (estimate-order-gen-data-points fn x0 x-limit y-limit))
-               fns)))
 
-  (define (plot-growth-in fns x0 x-limit y-limit)
-    (define (log10log10-points result)
-      (loglog-points 10 result))
-    (let* ((results (growth-results fns x0 x-limit y-limit))
-           (logresults (map log10log10-points results))
-           (line-renderers (plottables->plottable
-                            (map pairs->plottable
-                                 logresults))))
-      (plot line-renderers)))
-
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   (plot-new-window? #t)
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  (lambda ()
+  (displn "Plot growth in estimated order vs. kinds of coin used")
+  (let* ((kinds-list '(2 3 4 5))
+         (fns (counters-for-kinds kinds-list (cc-cached-for 5)))
+         (results
+          (zip kinds-list
+               (map-tree exact->inexact
+                         (map
+                          (lambda (fn)
+                            (estimate-order fn 100 1000 50000))
+                          fns))))
+         (renderer (pairs->renderer results)))
+    (displn results)
+    (plot renderer #:x-label "kinds" #:y-label "order"))
+  )
 
-  (displn "Plot growth in ways to make change vs amount for each kind of coin")
-  (let ((kinds-list '(2 3 4 5))
-        (cc-cached (cc-cached-for 5)))
-    (plot-growth-in (counters-for-kinds kinds-list cc-cached)
-                    100 1000 50000))
+  ;; (displn "Plot growth in 'time to count ways to make change with 5 kinds of coin' vs amount for algorithms with/without caching")
+  ;; ;; Plot how cached and un-cached functions perform
+  (#%require (only srfi/48 format))
+  (let* ((kinds-list '(2 3 4 5))
+         (cached-list (list #f #t))
+         (amount-list (map
+                       (lambda (i) (expt 2 i))
+                       (iota 10))))
+    (displn kinds-list)
+    (displn cached-list)
+    (displn amount-list)
 
-  (displn "Plot growth in 'time to count ways to make change with 5 kinds of coin' vs amount for algorithms with/without caching")
-  ;; Plot how cached and un-cached functions perform
-  (define (time-to-count-ways-to-change kinds cc)
-    (lambda (amount)
-      (cc-run-time (cc-perform-run cc kinds amount))))
-  (let ((cc-cached (cc-cached-for 5)))
-    (plot-growth-in (map (lambda (cc-fn) (time-to-count-ways-to-change 5 cc-fn))
-                         (list cc cc-cached))
-                    100 1000 1.0)))
+    (map (lambda (kinds)
+           (map (lambda (cached)
+                  (plot
+                   (pairs->renderer
+                    (map-tree
+                     exact->inexact
+                     (zip
+                      amount-list
+                      (map (lambda (amount)
+                             (cc-run-time
+                              (cc-perform-run
+                               (if cached
+                                   (cc-cached-for 5)
+                                   cc)
+                               kinds amount)))
+                           amount-list))))
+                   #:title (format "kinds ~d cached ~a" kinds cached)
+                   #:x-label "amount" #:y-label "time"
+                   ))
+                cached-list))
+         kinds-list))
+)
 
 ;; expect change count is O(amount^(#kinds-1)), but with counts for
 ;; small amounts influenced by lower #s of coins

@@ -5,6 +5,11 @@
 # been rebuilt by a raco make pass then we want to re-run the tests
 # from the corresponding .rkt file.
 #
+# Pre-requisites
+# - racket installed and PATH includes e.g. C:\program files\racket
+# - raco pkg install sicp
+#
+#
 # https://www.gnu.org/software/make/manual/html_node/Automatic-Variables.html
 .PHONY: default clean utils chap1 chap2 chap3
 

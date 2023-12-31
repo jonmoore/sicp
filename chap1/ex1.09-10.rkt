@@ -31,7 +31,7 @@
 
 (module+ main
   (begin-example "1.10")
-  (display (list "(A 1 1) " (A 1 1))) (newline)
+  (display (list "(A 1 10) " (A 1 10))) (newline)
   (display (list "(A 2 4) " (A 2 4))) (newline)
   (display (list "(A 3 3) " (A 3 3))) (newline))
 

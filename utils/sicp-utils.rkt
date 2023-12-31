@@ -8,7 +8,7 @@
 ;; r5rs/init.
 (#%require (only racket print-mpair-curly-braces))
 (#%require "srfi-1.rkt")
-(print-mpair-curly-braces #f)
+(print-mpair-curly-braces #t)
 
 ;; (#%provide identity)
 ;; (define (identity . args)
@@ -88,6 +88,7 @@
            tree)))
 
 (#%require (prefix r/ racket))
+(#%provide list->r/list-iter)
 (define (list->r/list-iter accum rest)
   (if (null? rest)
       accum
@@ -95,9 +96,34 @@
 
 (#%provide list->r/list)
 (define (list->r/list lis)
-;;  "Map a sicp list to a racket list"
-  (list->r/list-iter (r/list) lis))
+  ;;  "Map a sicp list to a racket list"
+;;  (displn lis)
+  (let* ((reversed-rlist (list->r/list-iter (r/list) lis))
+         (ret     (r/reverse reversed-rlist)))
+  ;;  (displn reversed-rlist)
+  ;;  (displn ret)
+    ret))
 
+(module+ test
+  (test-case
+      "convert empty list"
+    (check-equal? (r/list) (list->r/list (list)))))
+    
+(module+ test
+  (test-case
+      "convert length 1 list"
+    (check-equal? (r/list 1) (list->r/list (list 1)))))
+    
+(module+ test
+  (test-case
+      "convert length 2 list"
+    (check-equal? (r/list 1 2) (list->r/list (list 1 2)))))
+    
+(module+ test
+  (test-case
+      "convert length 3 list"
+    (check-equal? (r/list 1 2 3) (list->r/list (list 1 2 3)))))
+    
 (#%provide average)
 (define (average x y)
   (/ (+ x y) 2))
@@ -169,23 +195,24 @@
 
 (#%provide estimate-order-ex)
 (define (estimate-order-ex fn x0 x-limit y-limit next-x)
-  (define (dataf->order dataf)
-    (let* ((samples (take dataf 2))
-           (x1 (car (cadr samples)))
-           (y1 (cadr (cadr samples)))
-           (x2 (car (car samples)))
-           (y2 (cadr (car samples))))
-      (/ (- (log y1) (log y2))
-         (- (log x1) (log x2)))))
   (let* ((data (estimate-order-gen-data-points fn x0 x-limit y-limit next-x))
-         (dataf (map-tree exact->inexact data)))
-    (dataf->order dataf)))
+         (dataf (map-tree exact->inexact data))
+         (samples (take dataf 2))
+         (x1 (car (cadr samples)))
+         (y1 (cadr (cadr samples)))
+         (x2 (car (car samples)))
+         (y2 (cadr (car samples)))
+         )
+    (/ (- (log y1) (log y2))
+       (- (log x1) (log x2)))))
 
 (#%provide estimate-order)
 (define (estimate-order fn x0 x-limit y-limit)
   (define (next-x x)
     (floor (* 1.2 x)))
-  (estimate-order-ex fn x0 x-limit y-limit next-x))
+  (let ((res (estimate-order-ex fn x0 x-limit y-limit next-x)))
+    res))
+        
 
 (#%provide and-proc)
 (define (and-proc . lis)
