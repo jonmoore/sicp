@@ -1,1 +1,0 @@
-set "PLTCOLLECTS=%~dp0;"
