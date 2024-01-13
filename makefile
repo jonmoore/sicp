@@ -45,5 +45,4 @@ racotest.out: $(ZO_TEST_FILES)
 test: build racotest.out
 
 clean:
-	del /s *.zo
-	del raco_test.dummy
+	(shopt -s globstar; rm -f **/*.zo **/*.dep racotest.out racotest.err)
