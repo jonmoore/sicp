@@ -15,8 +15,8 @@
 *.zo
 
 *.dummy
-*raco_make.err
-*raco_make.out
+*.err
+*.out
 
 /chap3/*.png
 

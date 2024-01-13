@@ -2,10 +2,9 @@
 
 * Intro
 
-SICP exercises and related code
+  SICP exercises and related code
 
 * How-to
-
 *** Set up
 
     GNU Make 4.2 or later installed and on PATH
@@ -13,150 +12,150 @@ SICP exercises and related code
     Racket 6.11 or later installed
 
     The script ~setup.bat~ can be used to set up some basic
-    environment variables and keybindings.
+    environment variables and keybindings for cmd.exe.
 
 *** Build
-#+BEGIN_SRC
+    #+BEGIN_SRC
 make build
-#+END_SRC
+    #+END_SRC
 *** Run tests
-All tests:
-#+BEGIN_SRC
+    All tests:
+    #+BEGIN_SRC
 make build test
-#+END_SRC
+    #+END_SRC
 
-Tests for a given chapter:
-#+BEGIN_SRC
+    Tests for a given chapter:
+    #+BEGIN_SRC
 make chap3 test
-#+END_SRC
+    #+END_SRC
 
-Test just a given section of exercises
-#+BEGIN_SRC
+    Test just a given section of exercises
+    #+BEGIN_SRC
 raco test -t chap3\sect3.3.rkt
-#+END_SRC
+    #+END_SRC
 
 * Testing design
 
-The directories under test-approaches named below different ways of
-testing code in Racket.  The pattern used in rackunit7 fits our needs
-well.
+  The directories under test-approaches named below different ways of
+  testing code in Racket.  The pattern used in rackunit7 fits our needs
+  well.
 
 * Coding info
 *** rackunit test directories
 
-  These directories show different ways of testing code in Racket.  The
-  pattern used in rackunit7 fits our needs well.
+    These directories show different ways of testing code in Racket.  The
+    pattern used in rackunit7 fits our needs well.
 
 ***** rackunit1
-  - =sicp2-module-with-test-module.rkt=
+      - =sicp2-module-with-test-module.rkt=
 
-  Single file using ~#lang sicp2~, with a test module included.  The
-  ~sicp2~ language is essentially Racket.
+      Single file using ~#lang sicp2~, with a test module included.  The
+      ~sicp2~ language is essentially Racket.
 
 ***** rackunit2
-  - =sicp-module-with-test-module.rkt=
+      - =sicp-module-with-test-module.rkt=
 
-  Single file using ~#lang sicp~, with a test module included.
+      Single file using ~#lang sicp~, with a test module included.
 
 ***** rackunit3
-  - =sicp-module.rkt=
-  - =testing-sicp-module.rkt=
+      - =sicp-module.rkt=
+      - =testing-sicp-module.rkt=
 
-  =testing-sicp-module.rkt= requires a module defined in
-  =sicp-module.rkt=, then tests it with its own test module.
+      =testing-sicp-module.rkt= requires a module defined in
+      =sicp-module.rkt=, then tests it with its own test module.
 
 ***** rackunit4
-  - =sicp-script.rkt=
-  - =sicp-test-script.rkt=
+      - =sicp-script.rkt=
+      - =sicp-test-script.rkt=
 
-  =sicp-script.rkt= is a Racket script without any ~#lang~.
-  =sicp-test-script.rkt= loads it and then runs tests with ~run-tests~.
-  The definitions in =sicp-script.rkt= are evaluated at top-level and so
-  are visible to the test code.
+      =sicp-script.rkt= is a Racket script without any ~#lang~.
+      =sicp-test-script.rkt= loads it and then runs tests with ~run-tests~.
+      The definitions in =sicp-script.rkt= are evaluated at top-level and so
+      are visible to the test code.
 
 ***** rackunit5
-  - =double.rkt=
-  - =math.rkt=
+      - =double.rkt=
+      - =math.rkt=
 
-  Both files are ~#lang sicp~ modules containing ~test~ and ~main~
-  sub-modules defined with ~module+~, which is imported by requiring
-  ~racket~ (update: this is sub-optimal; see below for how to avoid
-  importing ~racket~ definitions).
+      Both files are ~#lang sicp~ modules containing ~test~ and ~main~
+      sub-modules defined with ~module+~, which is imported by requiring
+      ~racket~ (update: this is sub-optimal; see below for how to avoid
+      importing ~racket~ definitions).
 
-  Inline tests are provided via ~(module+ test)~.  This can be used
-  multiple times in one file, including using forward references to
-  definienda, i.e. the module structure has precedence over the text
-  ordering.
+      Inline tests are provided via ~(module+ test)~.  This can be used
+      multiple times in one file, including using forward references to
+      definienda, i.e. the module structure has precedence over the text
+      ordering.
 
-  Similarly, a main function is provided in ~(module+ main)~.  We can
-  also inline the main function in fragments throughout the file if we
-  like.
+      Similarly, a main function is provided in ~(module+ main)~.  We can
+      also inline the main function in fragments throughout the file if we
+      like.
 
-  Code reuse is performed via ~provide~ and ~require~.  For example,
-  =math.rkt= requires =double.rkt= and calls the ~double~ function that
-  it provides.
+      Code reuse is performed via ~provide~ and ~require~.  For example,
+      =math.rkt= requires =double.rkt= and calls the ~double~ function that
+      it provides.
 
-  In the command-line racket REPL definitions from sub-modules defined
-  with can be accessed as below.
-  #+BEGIN_SRC scheme
-    (require (submod "double.rkt" main))
-  #+END_SRC
-  In the Geiser REPL after entering =double.rkt= this does not to
-  work.  However it does work from a top-level Geiser REPL.
+      In the command-line racket REPL definitions from sub-modules defined
+      with can be accessed as below.
+      #+BEGIN_SRC scheme
+        (require (submod "double.rkt" main))
+      #+END_SRC
+      In the Geiser REPL after entering =double.rkt= this does not to
+      work.  However it does work from a top-level Geiser REPL.
 
-  In Emacs ~C-c C-a~ can be used to enter the scope of the module (or
-  sub-modules) as needed
+      In Emacs ~C-c C-a~ can be used to enter the scope of the module (or
+      sub-modules) as needed
 
 ***** rackunit6
-  - =sicp-example.rkt=
-  - =test-sicp-example.rkt=
+      - =sicp-example.rkt=
+      - =test-sicp-example.rkt=
 
-    This example shows how to test a sicp module without bringing any
-    unwanted racket definitions into scope, including in the test code.
-    The key is the use of ~only~ in the ~#%require~, as below.
-  #+BEGIN_SRC
+        This example shows how to test a sicp module without bringing any
+        unwanted racket definitions into scope, including in the test code.
+        The key is the use of ~only~ in the ~#%require~, as below.
+      #+BEGIN_SRC
   (#%require  (only racket module+))
-  #+END_SRC
+      #+END_SRC
 
 ***** rackunit7
-  - =double.rkt=
-  - =math.rkt=
+      - =double.rkt=
+      - =math.rkt=
 
-  An improved version of rackunit5, based on the approach in rackunit6,
-  i.e. using ~#%require~ with ~only~ to avoid bringing unwanted racket
-  definitions into scope.
+      An improved version of rackunit5, based on the approach in rackunit6,
+      i.e. using ~#%require~ with ~only~ to avoid bringing unwanted racket
+      definitions into scope.
 
 *** Avoiding use of ~racket~ definitions
 
-  Whenever we ~require~ or ~#%require~ ~racket~ as below,
-  : (#%require racket rackunit)
-  this brings Racket's definitions into scope which is liable to cause
-  conflicts with sicp definitions (e.g. the types of lists will not
-  match).
+    Whenever we ~require~ or ~#%require~ ~racket~ as below,
+    : (#%require racket rackunit)
+    this brings Racket's definitions into scope which is liable to cause
+    conflicts with sicp definitions (e.g. the types of lists will not
+    match).
 
-  To avoid this we can use the options below.
+    To avoid this we can use the options below.
 
 ***** use ~only~ or ~only-in~ to restrict the imported definitions
 
-        #+BEGIN_SRC scheme
-  (#%require  (only racket module+))
-        #+END_SRC
+      #+BEGIN_SRC racket
+        (#%require  (only racket module+))
+      #+END_SRC
 
-        #+BEGIN_SRC scheme
-  (require  (only-in racket module+))
-        #+END_SRC
+      #+BEGIN_SRC racket
+        (require  (only-in racket module+))
+      #+END_SRC
 
-        For reference see:
-        - [[https://docs.racket-lang.org/reference/require.html][documentation for "require"]], which includes
-        - [[https://docs.racket-lang.org/reference/require.html#%2528form._%2528%2528quote._~23~25kernel%2529._~23~25require%2529%2529][documentation for #%require]]
+      For reference see:
+      - [[https://docs.racket-lang.org/reference/require.html][documentation for "require"]], which includes
+      - [[https://docs.racket-lang.org/reference/require.html#%2528form._%2528%2528quote._~23~25kernel%2529._~23~25require%2529%2529][documentation for #%require]]
 
 ***** make definitions in a ~sicp~ sub-module
-  #+BEGIN_SRC scheme
-  (module inner sicp
-    (define baz 1)
-    (#%provide baz))
-  (require 'inner)
-  #+END_SRC
+      #+BEGIN_SRC racket
+        (module inner sicp
+          (define baz 1)
+          (#%provide baz))
+        (require 'inner)
+      #+END_SRC
 
 ***** make definitions in a ~#lang sicp~ file
 
@@ -277,3 +276,4 @@ well.
 
       A half-decent REPL, why isn't this the default?
       https://docs.racket-lang.org/xrepl/index.html
+

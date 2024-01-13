@@ -13,37 +13,37 @@
 # https://www.gnu.org/software/make/manual/html_node/Automatic-Variables.html
 .PHONY: default clean utils chap1 chap2 chap3
 
-default: build
+default: test
 
-export RACO_MAKE_FLAGS = -j 4 -v
+SHELL:=bash
+RG:=C:/Users/jonat/bin/rg.exe
+RACO:="C:/Program Files/Racket/raco.exe"
+
+export RACO_MAKE_FLAGS = -j 4
 
 # Find all the .rkt files using rackunit (the test is not exact) in
 # RKT_DIRS
 RKT_DIRS := utils chap1 chap2 chap3
-FIND_TEST_FILES=$(shell cmd /c "findstr /m /s rackunit  $(rkt_dir)\*.rkt")
+FIND_TEST_FILES=$(shell $(RG) --files-with-matches rackunit $(rkt_dir))
 RKT_TEST_FILES := $(foreach rkt_dir, $(RKT_DIRS), $(FIND_TEST_FILES))
+RKT_TEST_FILES := $(shell $(RG) --files-with-matches rackunit $(RKT_DIRS))
 ZO_TEST_FILES := $(join $(patsubst %, %compiled/, $(dir $(RKT_TEST_FILES))), \
 			$(patsubst %.rkt, %_rkt.zo, $(notdir $(RKT_TEST_FILES))))
 
+build:
+	raco make -j 4 $(RKT_TEST_FILES)
+.PHONY: build
 
-utils:
-	@raco_make_dir.bat utils
-chap1:
-	@raco_make_dir.bat chap1
-chap2:
-	@raco_make_dir.bat chap2
-chap3:
-	@raco_make_dir.bat chap3
-
-build: utils chap1 chap2 chap3
-
-# -q:quiet, -t:print table, -x:skip if no tests
+# --table            : print table of results at the end
+# --no-run-if-absent : skip if no tests
 # $? prerequisites that are newer than the target
-raco_test.dummy: $(ZO_TEST_FILES)
-	@raco test -j 4 -t -q -x $(subst \compiled,,$(?:_rkt.zo=.rkt))
-	echo testing_done > raco_test.dummy
+racotest.out: $(ZO_TEST_FILES)
+	$(RACO) test --make --jobs 4 --table --no-run-if-absent \
+		$(subst \compiled,,$(?:_rkt.zo=.rkt)) \
+		1> >(tee racotest.out) \
+		2> >(tee racotest.err)
 
-test: raco_test.dummy
+test: build racotest.out
 
 clean:
 	del /s *.zo
