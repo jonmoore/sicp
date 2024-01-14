@@ -144,7 +144,7 @@
             (append (cdr a) b))))
 
 (module+ test
-  (define (partition-check left right list)
+  (define (partition-check _left _right list)
     (for-each
      (lambda (n)
        (check-equal?
@@ -256,7 +256,7 @@
    (for-each
     (lambda (n)
       (check-equal?
-       (count (lambda (el) #t) (iota n))
+       (count (lambda (_el) #t) (iota n))
        n))
     (iota 10)))
   (test-case
@@ -434,7 +434,7 @@
 (module+ test
   (test-case
    "testing any"
-   (check-equal? (any (lambda (x) #t) '())
+   (check-equal? (any (lambda (_x) #t) '())
                  #f)
    (check-equal? (any values '(2 1))
                  2)
