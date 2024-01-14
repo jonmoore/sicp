@@ -36,12 +36,22 @@ build:
 # --no-run-if-absent : skip if no tests
 # $? prerequisites that are newer than the target
 racotest.out: $(ZO_TEST_FILES)
-	$(RACO) test --make --jobs 4 --table --no-run-if-absent \
+	$(RACO) test --make --quiet --quiet-program --jobs 4 --table --no-run-if-absent \
 		$(subst \compiled,,$(?:_rkt.zo=.rkt)) \
 		1> >(tee racotest.out) \
 		2> >(tee racotest.err)
 
+# as racotest.out but we use $^ rather than $? so that all the zo files are passed to raco
+# test
+racotest_all.out: $(ZO_TEST_FILES)
+	$(RACO) test --make --quiet --quiet-program --jobs 4  --table --no-run-if-absent \
+		$(subst \compiled,,$(^:_rkt.zo=.rkt)) \
+		1> >(tee racotest_all.out) \
+		2> >(tee racotest_all.err)
+
 test: build racotest.out
 
+testall: build racotest_all.out
+
 clean:
-	(shopt -s globstar; rm -f **/*.zo **/*.dep racotest.out racotest.err)
+	(shopt -s globstar; rm -f **/*.zo **/*.dep racotest.out racotest.err racotest_all.out racotest_all.err)
