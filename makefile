@@ -24,7 +24,6 @@ export RACO_MAKE_FLAGS = -j 4
 # Find all the .rkt files using rackunit (the test is not exact) in
 # RKT_DIRS
 RKT_DIRS := utils chap1 chap2 chap3
-FIND_TEST_FILES=$(shell $(RG) --files-with-matches rackunit $(rkt_dir))
 RKT_TEST_FILES := $(shell $(RG) --files-with-matches rackunit $(RKT_DIRS))
 ZO_TEST_FILES := $(join $(patsubst %, %compiled/, $(dir $(RKT_TEST_FILES))), \
 			$(patsubst %.rkt, %_rkt.zo, $(notdir $(RKT_TEST_FILES))))
