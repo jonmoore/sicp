@@ -1,5 +1,23 @@
 # sicp  -*- fill-column: 70; -*-
 
+* Contents :TOC_3:
+- [[#intro][Intro]]
+- [[#basic-how-tos-for-this-repo][Basic how-tos for this repo]]
+    - [[#set-up][Set up]]
+    - [[#build][Build]]
+    - [[#run-tests][Run tests]]
+    - [[#testing-design][Testing design]]
+- [[#racket-how-tos][Racket how-tos]]
+    - [[#run-a-script-including-main][Run a script, including main]]
+    - [[#run-a-repl-requiring-a-file][Run a REPL, requiring a file]]
+    - [[#selected-options-for-racket][Selected options for 'racket']]
+    - [[#debug-in-the-repl][Debug in the repl]]
+    - [[#get-help-in-the-repl][Get help in the repl]]
+    - [[#get-better-stack-traces-with-errortrace][Get better stack traces with errortrace]]
+    - [[#use-a-better-repl-xrepl][Use a better REPL (xrepl)]]
+    - [[#install-third-party-packages][Install third-party packages]]
+    - [[#declare-dependencies-on-third-party-packages][Declare dependencies on third-party packages]]
+
 * Intro
 
   SICP exercises and related code
