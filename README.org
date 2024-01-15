@@ -4,12 +4,16 @@
 
   SICP exercises and related code
 
-* How-to
+* Basic how-tos for this repo
 *** Set up
 
     GNU Make 4.2 or later installed and on PATH
 
     Racket 6.11 or later installed
+
+    ripgrep installed and on PATH
+
+    bash installed and on PATH, e.g. through Git for Windows.
 
     The script ~setup.bat~ can be used to set up some basic
     environment variables and keybindings for cmd.exe.
@@ -19,68 +23,33 @@
 make build
     #+END_SRC
 *** Run tests
-    All tests:
+    All tests (also builds):
     #+BEGIN_SRC
-make build test
+make testall
     #+END_SRC
 
-    Tests for a given chapter:
+    Incremental tests (also builds):
     #+BEGIN_SRC
-make chap3 test
+make test
     #+END_SRC
 
-    Test just a given section of exercises
+    Test a given section of exercises
     #+BEGIN_SRC
 raco test -t chap3\sect3.3.rkt
     #+END_SRC
 
-* Testing design
+*** Testing design
+***** File and directory structure
+      This is shown under test-approaches/rackunit7, which contains these
+      files.
 
-  The directories under test-approaches named below different ways of
-  testing code in Racket.  The pattern used in rackunit7 fits our needs
-  well.
-
-* Coding info
-*** rackunit test directories
-
-    These directories show different ways of testing code in Racket.  The
-    pattern used in rackunit7 fits our needs well.
-
-***** rackunit1
-      - =sicp2-module-with-test-module.rkt=
-
-      Single file using ~#lang sicp2~, with a test module included.  The
-      ~sicp2~ language is essentially Racket.
-
-***** rackunit2
-      - =sicp-module-with-test-module.rkt=
-
-      Single file using ~#lang sicp~, with a test module included.
-
-***** rackunit3
-      - =sicp-module.rkt=
-      - =testing-sicp-module.rkt=
-
-      =testing-sicp-module.rkt= requires a module defined in
-      =sicp-module.rkt=, then tests it with its own test module.
-
-***** rackunit4
-      - =sicp-script.rkt=
-      - =sicp-test-script.rkt=
-
-      =sicp-script.rkt= is a Racket script without any ~#lang~.
-      =sicp-test-script.rkt= loads it and then runs tests with ~run-tests~.
-      The definitions in =sicp-script.rkt= are evaluated at top-level and so
-      are visible to the test code.
-
-***** rackunit5
       - =double.rkt=
       - =math.rkt=
 
       Both files are ~#lang sicp~ modules containing ~test~ and ~main~
-      sub-modules defined with ~module+~, which is imported by requiring
-      ~racket~ (update: this is sub-optimal; see below for how to avoid
-      importing ~racket~ definitions).
+      sub-modules defined with ~module+~, which is imported by using
+      ~#%require~ with ~only~ to avoid bringing unwanted racket
+      definitions into scope.
 
       Inline tests are provided via ~(module+ test)~.  This can be used
       multiple times in one file, including using forward references to
@@ -91,189 +60,170 @@ raco test -t chap3\sect3.3.rkt
       also inline the main function in fragments throughout the file if we
       like.
 
-      Code reuse is performed via ~provide~ and ~require~.  For example,
-      =math.rkt= requires =double.rkt= and calls the ~double~ function that
-      it provides.
+      Code reuse is performed via ~#%provide~ and ~#%require~.  For
+      example, =math.rkt= requires =double.rkt= and calls the ~double~
+      function that it provides.
 
       In the command-line racket REPL definitions from sub-modules defined
       with can be accessed as below.
       #+BEGIN_SRC scheme
         (require (submod "double.rkt" main))
       #+END_SRC
-      In the Geiser REPL after entering =double.rkt= this does not to
-      work.  However it does work from a top-level Geiser REPL.
+***** Avoiding use of ~racket~ definitions
+      Whenever we ~require~ or ~#%require~ ~racket~ as below,
+      : (#%require racket rackunit)
+      this brings Racket's definitions into scope, which is liable to
+      cause conflicts with sicp definitions (e.g. the types of lists
+      will not match).
 
-      In Emacs ~C-c C-a~ can be used to enter the scope of the module (or
-      sub-modules) as needed
+      To avoid this we can use one of the options below.
 
-***** rackunit6
-      - =sicp-example.rkt=
-      - =test-sicp-example.rkt=
+******* use ~only~ or ~only-in~ to restrict the imported definitions
 
-        This example shows how to test a sicp module without bringing any
-        unwanted racket definitions into scope, including in the test code.
-        The key is the use of ~only~ in the ~#%require~, as below.
-      #+BEGIN_SRC
-  (#%require  (only racket module+))
-      #+END_SRC
+        #+BEGIN_SRC racket
+          (#%require  (only racket module+))
+        #+END_SRC
 
-***** rackunit7
-      - =double.rkt=
-      - =math.rkt=
+        #+BEGIN_SRC racket
+          (require  (only-in racket module+))
+        #+END_SRC
 
-      An improved version of rackunit5, based on the approach in rackunit6,
-      i.e. using ~#%require~ with ~only~ to avoid bringing unwanted racket
-      definitions into scope.
+        For reference see:
+        - [[https://docs.racket-lang.org/reference/require.html][documentation for "require"]], which includes
+        - [[https://docs.racket-lang.org/reference/require.html#%2528form._%2528%2528quote._~23~25kernel%2529._~23~25require%2529%2529][documentation for #%require]]
 
-*** Avoiding use of ~racket~ definitions
+        ~require~ expands to ~#%require~, a lower-level import form. A
+        requirement spec for ~#%require~ is similar to one for
+        ~require~, except that the syntax is more constrained, not
+        composable, and not extensible.
 
-    Whenever we ~require~ or ~#%require~ ~racket~ as below,
-    : (#%require racket rackunit)
-    this brings Racket's definitions into scope which is liable to cause
-    conflicts with sicp definitions (e.g. the types of lists will not
-    match).
+******* make definitions in a ~sicp~ sub-module
+        #+BEGIN_SRC racket
+          (module inner sicp
+            (define baz 1)
+            (#%provide baz))
+          (require 'inner)
+        #+END_SRC
 
-    To avoid this we can use the options below.
+******* make definitions in a ~#lang sicp~ file
 
-***** use ~only~ or ~only-in~ to restrict the imported definitions
+* Racket how-tos
+*** Run a script, including main
+    #+begin_src bat
+      racket chap1\ex1.09-10.rkt
+    #+end_src
+    The above is equivalent to any of these
+    #+begin_src shell
+      racket -u chap1\ex1.09-10.rkt
+      racket --require-script chap1\ex1.09-10.rkt
+      racket -t chap1\ex1.09-10.rkt -N chap1\ex1.09-10.rkt
+      racket --require chap1\ex1.09-10.rkt --name chap1\ex1.09-10.rkt
+      racket --eval  '(require (file "chap1\ex1.09-10.rkt"))' --name chap1\ex1.09-10.rkt
+      # --name <file> sets `(find-system-path 'run-file)` to <file>
+    #+end_src
+*** Run a REPL, requiring a file
+    #+begin_src shell
+      # gotcha: the -i has to be first!
+      racket -i -u utils\sicp-utils.rkt
+    #+end_src
+*** Selected options for 'racket'
+    : usage: racket [<option> ...] <argument> ...
+    :
+    : File and expression options:
+    :
 
-      #+BEGIN_SRC racket
-        (#%require  (only racket module+))
-      #+END_SRC
+    -e and variants
+    :   -e <exprs>, --eval <exprs>
+    :      Evaluate <exprs>, print results
+    :   -f <file>, --load <file>
+    :      Like -e '(load "<file>")' without printing
+    :   -t <file>, --require <file>
+    :      Like -e '(require (file "<file>"))' [*]
+    :   -l <path>, --lib <path>
+    :      Like -e '(require (lib "<path>"))' [*]
 
-      #+BEGIN_SRC racket
-        (require  (only-in racket module+))
-      #+END_SRC
+    Variants with "-n"
+    :   -r <file>, --script <file>
+    :      Same as -f <file> -N <file> --
+    :   -u <file>, --require-script <file>
+    :      Same as -t <file> -N <file> --
 
-      For reference see:
-      - [[https://docs.racket-lang.org/reference/require.html][documentation for "require"]], which includes
-      - [[https://docs.racket-lang.org/reference/require.html#%2528form._%2528%2528quote._~23~25kernel%2529._~23~25require%2529%2529][documentation for #%require]]
+    :   -m, --main
+    :      Call `main` with command-line arguments, print results
+    :
+    :  [*] Also `require`s a `main` submodule, if any
 
-***** make definitions in a ~sicp~ sub-module
-      #+BEGIN_SRC racket
-        (module inner sicp
-          (define baz 1)
-          (#%provide baz))
-        (require 'inner)
-      #+END_SRC
+    : Interaction options:
+    :
+    :   -i, --repl
+    :      Run interactive read-eval-print loop; implies -v
+    :   -n, --no-lib
+    :      Skip `(require (lib "<init-lib>"))` for -i/-e/-f/-r
 
-***** make definitions in a ~#lang sicp~ file
+    : Configuration options:
+    :
+    :   -y, --make
+    :      Yes, enable automatic update of compiled files
+    :   -I <path>
+    :      Set <init-lib> to <path> (sets language)
 
-* How tos
-*** Run rkt files from the command line
-***** Run a script, including main
-      #+begin_src bat
-        racket chap1\ex1.09-10.rkt
-      #+end_src
-      The above is equivalent to any of these
-      #+begin_src shell
-        racket -u chap1\ex1.09-10.rkt
-        racket --require-script chap1\ex1.09-10.rkt
-        racket -t chap1\ex1.09-10.rkt -N chap1\ex1.09-10.rkt
-        racket --require chap1\ex1.09-10.rkt --name chap1\ex1.09-10.rkt
-        racket --eval  '(require (file "chap1\ex1.09-10.rkt"))' --name chap1\ex1.09-10.rkt
-        # --name <file> sets `(find-system-path 'run-file)` to <file>
-      #+end_src
-***** Run a REPL, requiring a file
-      #+begin_src shell
-        # gotcha: the -i has to be first!
-        racket -i -u utils\sicp-utils.rkt
-      #+end_src
-***** Selected options for 'racket'
-      : usage: racket [<option> ...] <argument> ...
-      : 
-      : File and expression options:
-      :
+    : Meta options:
+    :
+    :   --
+    :      No argument following this switch is used as a switch
 
-      -e and variants
-      :   -e <exprs>, --eval <exprs>
-      :      Evaluate <exprs>, print results
-      :   -f <file>, --load <file>
-      :      Like -e '(load "<file>")' without printing
-      :   -t <file>, --require <file>
-      :      Like -e '(require (file "<file>"))' [*]
-      :   -l <path>, --lib <path>
-      :      Like -e '(require (lib "<path>"))' [*]
+    : Default options:
+    :
+    :   * If only configuration options are provided, -i is added
+    :   * If only configuration options are before the first
+    :     argument, -u is added
+    :   * If -t/-l/-p/-u appears before the first -i/-e/-f/-r,
+    :     -n is added
+    :   * <init-lib> defaults to racket/init
+    :
+    : Start-up sequence:
+    :
+    :   1. Set `current-library-collection-paths`
+    :   2. Require `(lib "<init-lib>")` [when -i/-e/-f/-r, unless -n]
+    :   3. Evaluate/load expressions/files in order, until first error
+    :   4. Load "racketrc.rktl" [when -i]
+    :   5. Run read-eval-print loop [when -i]
+*** Debug in the repl
+    https://docs.racket-lang.org/debug/index.html
+    : (#%require debug/repl)
+    : (debug-repl)
+*** Get help in the repl
+    Seems to be broken out of the box
+    : (#%require racket/help)
+*** Get better stack traces with errortrace
 
-      Variants with "-n"
-      :   -r <file>, --script <file>
-      :      Same as -f <file> -N <file> --
-      :   -u <file>, --require-script <file>
-      :      Same as -t <file> -N <file> --
+    gotcha: the default "stack traces" reported by racket are
+    incomplete, possibly due to optimizations.
 
-      :   -m, --main
-      :      Call `main` with command-line arguments, print results
-      : 
-      :  [*] Also `require`s a `main` submodule, if any
+    To get more meaningful traces, use the errortrace library
 
-      : Interaction options:
-      : 
-      :   -i, --repl
-      :      Run interactive read-eval-print loop; implies -v
-      :   -n, --no-lib
-      :      Skip `(require (lib "<init-lib>"))` for -i/-e/-f/-r
+    : racket -l errortrace -t file.rkt
+    : racket --lib errortrace --require file.rkt
 
-      : Configuration options:
-      : 
-      :   -y, --make
-      :      Yes, enable automatic update of compiled files
-      :   -I <path>
-      :      Set <init-lib> to <path> (sets language)
+    https://docs.racket-lang.org/errortrace/index.html
 
-      : Meta options:
-      : 
-      :   --
-      :      No argument following this switch is used as a switch
+    At
+    https://groups.google.com/g/racket-users/c/CiwfIum7d4s/m/9_4fcT4zIHIJ
+    Robby Findler suggests using xrepl, drracket or emacs.
+*** Use a better REPL (xrepl)
 
-      : Default options:
-      : 
-      :   * If only configuration options are provided, -i is added
-      :   * If only configuration options are before the first
-      :     argument, -u is added
-      :   * If -t/-l/-p/-u appears before the first -i/-e/-f/-r,
-      :     -n is added
-      :   * <init-lib> defaults to racket/init
-      : 
-      : Start-up sequence:
-      : 
-      :   1. Set `current-library-collection-paths`
-      :   2. Require `(lib "<init-lib>")` [when -i/-e/-f/-r, unless -n]
-      :   3. Evaluate/load expressions/files in order, until first error
-      :   4. Load "racketrc.rktl" [when -i]
-      :   5. Run read-eval-print loop [when -i]
-***** How to install a third-party package
+    A half-decent REPL, why isn't this the default?
+    https://docs.racket-lang.org/xrepl/index.html
+*** Install third-party packages
 
-      Gripe: In the style of many purist computer-science languages
-      (see also Haskell) racket defaults to the kind of global,
-      build-from-source approach to package management that is
-      basically a recipe for works-on-my-machine bugs.
+    Gripe: In the style of many purist computer-science languages
+    (see also Haskell) racket defaults to the kind of global,
+    build-from-source approach to package management that is
+    basically a recipe for works-on-my-machine bugs.
 
-      Anyhow ...
-      : raco pkg install <package-name>
-***** Debugging in the repl
-      https://docs.racket-lang.org/debug/index.html
-      : (#%require debug/repl)
-      : (debug-repl)
-***** Help in the repl
-      Seems to be broken out of the box
-      : (#%require racket/help)
-***** better stack traces with errortrace
-
-      gotcha: the default "stack traces" reported by racket are
-      incomplete, possibly due to optimizations.
-
-      To get more meaningful traces, use the errortrace library
-      
-      : racket -l errortrace -t file.rkt
-      : racket --lib errortrace --require file.rkt
-
-      https://docs.racket-lang.org/errortrace/index.html
-      
-      At
-      https://groups.google.com/g/racket-users/c/CiwfIum7d4s/m/9_4fcT4zIHIJ
-      Robby Findler suggests using xrepl, drracket or emacs.
-***** xrepl
-
-      A half-decent REPL, why isn't this the default?
-      https://docs.racket-lang.org/xrepl/index.html
-
+    Anyhow ...
+    : raco pkg install <package-name>
+*** Declare dependencies on third-party packages
+    There is a system for declaring dependencies using files called
+    ~info.rkt~.  ~raco pkg install~ supports installing these
+    automatically.
