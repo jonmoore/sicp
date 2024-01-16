@@ -24,17 +24,26 @@
 
 * Basic how-tos for this repo
 *** Set up
-
-    GNU Make 4.2 or later installed and on PATH
-
-    Racket 6.11 or later installed
-
-    ripgrep installed and on PATH
-
-    bash installed and on PATH, e.g. through Git for Windows.
-
-    The script ~setup.bat~ can be used to set up some basic
-    environment variables and keybindings for cmd.exe.
+***** Operating system - Windows but not Windows Server 2022
+      Windows 10, Windows 11 and Windows Server 2019 should be fine.
+***** Dependencies
+      These should be installed and the main binaries on PATH
+******* Racket >=6.11
+        The installer normally uses a GUI.   To run without a GUI pass /s, e.g
+        #+begin_src bat
+          "C:\Users\jonat\Temp\chocolatey\racket\8.11.1\racket-8.11.1-x86_64-win32-cs.exe" /S 
+        #+end_src
+        Chocolatey can also be used
+        #+begin_src bat
+          choco install racket
+        #+end_src
+******* Racket packages sicp and debug
+******* GNU Make >=4.2
+******* ripgrep
+******* bash, e.g. through Git for Windows.
+***** setup.bat
+      The script ~setup.bat~ can be used to set up some basic
+      environment variables and keybindings for cmd.exe.
 
 *** Build
     #+BEGIN_SRC

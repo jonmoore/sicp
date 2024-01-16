@@ -1,0 +1,70 @@
+name: SICP Testing
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  windows:
+    # as of racket 8.11, not the windows-latest image (i.e. Windows Server 2022) as raco
+    # make crashes
+    runs-on: windows-2019
+    strategy:
+      fail-fast: false
+      matrix:
+        racket_version:
+          - '8.10'            # match version that's good locally
+          # - 'stable'            # most recent release
+
+    name: Racket ${{ matrix.racket_version }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Show bash version
+        run: bash --version
+
+      - name: Show bash location
+        run: where.exe bash
+
+      - name: Show bash environment
+        run: bash -c "env | sort"
+
+      - name: Show git version
+        run: git --version
+
+      - name: Show make version
+        run: make --version
+
+      - name: Install ripgrep
+        run: choco install ripgrep
+
+      - name: Show ripgrep version
+        run: rg --version
+
+      - name: Install Racket
+        uses: Bogdanp/setup-racket@v1.10
+        with:
+          architecture: 'x64'
+          distribution: 'full'
+          version: ${{ matrix.racket_version }}
+
+      - name: Show Racket version
+        run: racket --version
+
+      - name: Install Racket packages
+        run: raco pkg install --auto debug sicp
+
+      - name: make
+        run: make --debug=verbose,jobs test
+
+# For the semi-colons - see ridiculous gotcha at
+# https://docs.racket-lang.org/guide/module-basics.html
+#      - name: Set PLTCOLLECTS
+#        run: echo ("PLTCOLLECTS=;" + (Get-Item .).FullName +";") >> $env:GITHUB_ENV
+
+#      - name: Echo PLTCOLLECTS
+#        run:  echo ("PLTCOLLECTS is " + $env:PLTCOLLECTS)
