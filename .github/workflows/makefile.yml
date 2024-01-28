@@ -20,7 +20,7 @@ jobs:
           - '8.11'
           - 'stable'
 
-    name: Racket ${{ matrix.racket_version }}
+    name: ${{ matrix.os }}, Racket ${{ matrix.racket_version }}
 
     steps:
       - name: Checkout
