@@ -17,8 +17,8 @@ jobs:
       matrix:
         os: [windows-2019, windows-2022]
         racket_version:
-          - '8.10'            # match version that's good locally
-          # - 'stable'            # most recent release
+          - '8.11'
+          - 'stable'
 
     name: Racket ${{ matrix.racket_version }}
 
