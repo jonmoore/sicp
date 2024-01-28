@@ -7,11 +7,17 @@
 #
 # Pre-requisites
 # - racket installed and PATH includes e.g. C:\program files\racket
-# - raco pkg install sicp
-#
+# - raco pkg install sicp debug
+# - ripgrep
 #
 # https://www.gnu.org/software/make/manual/html_node/Automatic-Variables.html
-.PHONY: default clean build
+
+
+################################################################################
+#
+# Block for setup
+
+.PHONY: default clean build test testall
 
 default: test
 
@@ -24,29 +30,67 @@ RKT_TEST_FILES := $(shell rg --files-with-matches rackunit $(RKT_DIRS))
 ZO_TEST_FILES := $(join $(patsubst %, %compiled/, $(dir $(RKT_TEST_FILES))), \
 			$(patsubst %.rkt, %_rkt.zo, $(notdir $(RKT_TEST_FILES))))
 
-build:
-	raco make -v -j 4 $(RKT_TEST_FILES)
 
+################################################################################
+#
+# Block for target "build"
+#
+# Build compiled racket files
+#
+# make notes: The foreach loop below is a workaround for what appears to be a bug in raco
+# make on recent versions of Windows.  It seems that if passed a long list of targets to
+# build, "raco make" will crash early with an error status indicating heap corruption.
+# The definition of newline is a fairly common trick to generate multiple commands from
+# one make function (see e.g. https://stackoverflow.com/a/7040400)
+define newline
+
+
+endef
+
+build:
+	$(foreach rkt_dir, $(RKT_DIRS), \
+		raco make -j 4 $(filter $(rkt_dir)%, $(RKT_TEST_FILES)) $(newline))
+
+
+################################################################################
+# In this block we try to run tests for only those files that need to be updated
+#
+# Block for target "test"
+#
 # --table            : print table of results at the end
 # --no-run-if-absent : skip if no tests
-# $? prerequisites that are newer than the target
-racotest.out: $(ZO_TEST_FILES)
-	raco test --make --quiet --quiet-program --jobs 4 --table --no-run-if-absent \
-		$(subst \compiled,,$(?:_rkt.zo=.rkt)) \
-		1> >(tee racotest.out) \
-		2> >(tee racotest.err)
+#
+# $? is the list of prerequisites that are newer than the target.
 
-# as racotest.out but we use $^ rather than $? so that all the zo files are passed to raco
-# test
-racotest_all.out: $(ZO_TEST_FILES)
-	raco test --make --quiet --quiet-program --jobs 4  --table --no-run-if-absent \
-		$(subst \compiled,,$(^:_rkt.zo=.rkt)) \
-		1> >(tee racotest_all.out) \
-		2> >(tee racotest_all.err)
+# defining maybe_test as a callable helps avoid duplication of the list of
+# files that tests need to be run for, i.e. $(1) in this context
+maybe_test = $(if $(strip $(1)), \
+		raco test  --make --quiet --quiet-program --jobs 4  --table --no-run-if-absent $(strip $(1)), \
+		@echo skipping $(strip $(2)) - no tests need to be run) $(newline)
+
+racotest.out: $(ZO_TEST_FILES)
+	$(foreach rkt_dir, $(RKT_DIRS), \
+	$(call maybe_test, $(filter $(rkt_dir)%, $(subst \compiled,,$(?:_rkt.zo=.rkt))), $(rkt_dir)))
+	touch $@
 
 test: build racotest.out
 
+################################################################################
+# as racotest.out but we use $^ rather than $? so that all the zo files are passed to raco
+# test.  This may need to be fixed to work around the same raco bug as in build
+#
+# Block for target "testall"
+#
+racotest_all.out: $(ZO_TEST_FILES)
+	$(foreach rkt_dir, $(RKT_DIRS), \
+	$(call maybe_test, $(filter $(rkt_dir)%, $(subst \compiled,,$(^:_rkt.zo=.rkt))), $(rkt_dir)))
+	touch $@
+
 testall: build racotest_all.out
 
+################################################################################
+#
+# Block for target "clean"
+#
 clean:
 	(shopt -s globstar; rm -f **/*.zo **/*.dep racotest.out racotest.err racotest_all.out racotest_all.err)
