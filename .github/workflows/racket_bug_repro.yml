@@ -1,4 +1,4 @@
-name: SICP Testing
+name: Racket parsing reproducer 
 
 on:
   workflow_dispatch:
