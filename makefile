@@ -31,15 +31,15 @@ ZO_TEST_FILES := $(join $(patsubst %, %compiled/, $(dir $(RKT_TEST_FILES))), \
 			$(patsubst %.rkt, %_rkt.zo, $(notdir $(RKT_TEST_FILES))))
 
 
+# The foreach loops over $(RKT_DIRS) below are a workaround for
+# https://github.com/racket/racket/issues/4915.
+
 ################################################################################
 #
 # Block for target "build"
 #
 # Build compiled racket files
 #
-# make notes: The foreach loop below is a workaround for what appears to be a bug in raco
-# make on recent versions of Windows.  It seems that if passed a long list of targets to
-# build, "raco make" will crash early with an error status indicating heap corruption.
 # The definition of newline is a fairly common trick to generate multiple commands from
 # one make function (see e.g. https://stackoverflow.com/a/7040400)
 define newline
@@ -53,7 +53,7 @@ build:
 
 
 ################################################################################
-# In this block we try to run tests for only those files that need to be updated
+# In this block we try to run only those tests that need to be rerun
 #
 # Block for target "test"
 #
