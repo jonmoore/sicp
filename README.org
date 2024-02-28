@@ -1,20 +1,27 @@
 # sicp  -*- fill-column: 70; -*-
 
-* Contents :TOC_3:
+* Contents :TOC_5:
 - [[#intro][Intro]]
 - [[#basic-how-tos-for-this-repo][Basic how-tos for this repo]]
     - [[#set-up][Set up]]
+        - [[#operating-system---windows-but-not-windows-server-2022][Operating system - Windows but not Windows Server 2022]]
+        - [[#dependencies][Dependencies]]
+        - [[#setupbat][setup.bat]]
     - [[#build][Build]]
     - [[#run-tests][Run tests]]
     - [[#testing-design][Testing design]]
+        - [[#file-and-directory-structure][File and directory structure]]
+        - [[#avoiding-use-of-racket-definitions][Avoiding use of ~racket~ definitions]]
 - [[#racket-how-tos][Racket how-tos]]
     - [[#run-a-script-including-main][Run a script, including main]]
-    - [[#run-a-repl-requiring-a-file][Run a REPL, requiring a file]]
+    - [[#working-with-the-repl-always-use-xrepl][Working with the REPL (always use xrepl!!)]]
+        - [[#use-xrepl-instead][Use xrepl instead]]
+        - [[#run-a-repl-requiring-a-file][Run a REPL, requiring a file]]
+        - [[#use-the-repl-inside-a-module][Use the REPL "inside" a module]]
+        - [[#debug-in-the-repl][Debug in the repl]]
+        - [[#get-help-in-the-repl][Get help in the repl]]
+        - [[#get-better-stack-traces-with-errortrace][Get better stack traces with errortrace]]
     - [[#selected-options-for-racket][Selected options for 'racket']]
-    - [[#debug-in-the-repl][Debug in the repl]]
-    - [[#get-help-in-the-repl][Get help in the repl]]
-    - [[#get-better-stack-traces-with-errortrace][Get better stack traces with errortrace]]
-    - [[#use-a-better-repl-xrepl][Use a better REPL (xrepl)]]
     - [[#install-third-party-packages][Install third-party packages]]
     - [[#declare-dependencies-on-third-party-packages][Declare dependencies on third-party packages]]
 
@@ -31,7 +38,7 @@
 ******* Racket >=6.11
         The installer normally uses a GUI.   To run without a GUI pass /s, e.g
         #+begin_src bat
-          "C:\Users\jonat\Temp\chocolatey\racket\8.11.1\racket-8.11.1-x86_64-win32-cs.exe" /S 
+          "C:\Users\jonat\Temp\chocolatey\racket\8.11.1\racket-8.11.1-x86_64-win32-cs.exe" /S
         #+end_src
         Chocolatey can also be used
         #+begin_src bat
@@ -148,32 +155,82 @@ raco test -t chap3\sect3.3.rkt
       racket --eval  '(require (file "chap1\ex1.09-10.rkt"))' --name chap1\ex1.09-10.rkt
       # --name <file> sets `(find-system-path 'run-file)` to <file>
     #+end_src
-*** Run a REPL, requiring a file
-    #+begin_src shell
-      # gotcha: the -i has to be first!
-      racket -i -u utils\sicp-utils.rkt
-    #+end_src
+*** Working with the REPL (always use xrepl!!)
+***** Use xrepl instead
+      Much better, should be the default:
+      https://docs.racket-lang.org/xrepl/index.html
+
+***** Run a REPL, requiring a file
+      #+begin_src shell
+        # gotcha: the -i has to be first!
+        racket -i -u utils\sicp-utils.rkt
+      #+end_src
+
+***** Use the REPL "inside" a module
+      Assume we want to access definitions in module foo.rkt that
+      defines x but does not provide it externally.
+******* With xrepl
+        #+begin_src bash
+          $ racket
+          Welcome to Racket vX.X.X.
+          -> ,en foo.rkt
+          "foo.rkt"> (+ x 12)
+          54
+        #+end_src
+******* Without xrepl
+        #+begin_src bash
+          $ racket
+          > (enter! "foo.rkt")
+          > x
+          42
+        #+end_src
+        #+begin_src
+          $ racket -i --eval '(enter! "foo.rkt")'
+        #+end_src
+***** Debug in the repl
+      https://docs.racket-lang.org/debug/index.html
+      : (#%require debug/repl)
+      : (debug-repl)
+***** Get help in the repl
+      Seems to be broken out of the box
+      : (#%require racket/help)
+***** Get better stack traces with errortrace
+
+      gotcha: the default "stack traces" reported by racket are
+      incomplete, possibly due to optimizations.
+
+      To get more meaningful traces, use the errortrace library
+
+      : racket --lib errortrace --require file.rkt
+
+      https://docs.racket-lang.org/errortrace/index.html
+
+      At
+      https://groups.google.com/g/racket-users/c/CiwfIum7d4s/m/9_4fcT4zIHIJ
+      Robby Findler suggests using xrepl, drracket or emacs.
 *** Selected options for 'racket'
     : usage: racket [<option> ...] <argument> ...
     :
     : File and expression options:
     :
 
-    -e and variants
-    :   -e <exprs>, --eval <exprs>
+    --eval and variants
+    :   --eval <exprs>, -e <exprs>
     :      Evaluate <exprs>, print results
-    :   -f <file>, --load <file>
-    :      Like -e '(load "<file>")' without printing
-    :   -t <file>, --require <file>
-    :      Like -e '(require (file "<file>"))' [*]
-    :   -l <path>, --lib <path>
-    :      Like -e '(require (lib "<path>"))' [*]
+    :   --load <file>, -f <file>
+    :      Like --eval '(load "<file>")' without printing
+    :   --require <file>, -t <file>
+    :      Like --eval '(require (file "<file>"))' [*]
+    :   --lib <path>, -l <path>
+    :      Like --eval '(require (lib "<path>"))' [*]
 
-    Variants with "-n"
-    :   -r <file>, --script <file>
-    :      Same as -f <file> -N <file> --
-    :   -u <file>, --require-script <file>
-    :      Same as -t <file> -N <file> --
+    :   --name <file>, -N <file>
+    :      Sets `(find-system-path 'run-file)` to <file>
+    Variants with "--name"
+    :   --script <file>, -r <file>
+    :      Same as --load <file> --name <file> --
+    :   --require-script <file>, -u <file>
+    :      Same as --require <file> --name <file> --
 
     :   -m, --main
     :      Call `main` with command-line arguments, print results
@@ -203,44 +260,19 @@ raco test -t chap3\sect3.3.rkt
     :
     :   * If only configuration options are provided, -i is added
     :   * If only configuration options are before the first
-    :     argument, -u is added
-    :   * If -t/-l/-p/-u appears before the first -i/-e/-f/-r,
-    :     -n is added
+    :     argument, -u/--require-script is added
+    :   * If -t/--require/-l/--lib/-p/-u/--require-script appears
+    :     before the first -i/--repl/-e/--eval/-f/--load/-r/--script,
+    :     --no-lib is added
     :   * <init-lib> defaults to racket/init
     :
     : Start-up sequence:
     :
     :   1. Set `current-library-collection-paths`
-    :   2. Require `(lib "<init-lib>")` [when -i/-e/-f/-r, unless -n]
+    :   2. Require `(lib "<init-lib>")` [when -i/--repl/-e/--eval/-f/--load/-r/--require, unless -n/--no-lib]
     :   3. Evaluate/load expressions/files in order, until first error
     :   4. Load "racketrc.rktl" [when -i]
     :   5. Run read-eval-print loop [when -i]
-*** Debug in the repl
-    https://docs.racket-lang.org/debug/index.html
-    : (#%require debug/repl)
-    : (debug-repl)
-*** Get help in the repl
-    Seems to be broken out of the box
-    : (#%require racket/help)
-*** Get better stack traces with errortrace
-
-    gotcha: the default "stack traces" reported by racket are
-    incomplete, possibly due to optimizations.
-
-    To get more meaningful traces, use the errortrace library
-
-    : racket -l errortrace -t file.rkt
-    : racket --lib errortrace --require file.rkt
-
-    https://docs.racket-lang.org/errortrace/index.html
-
-    At
-    https://groups.google.com/g/racket-users/c/CiwfIum7d4s/m/9_4fcT4zIHIJ
-    Robby Findler suggests using xrepl, drracket or emacs.
-*** Use a better REPL (xrepl)
-
-    A half-decent REPL, why isn't this the default?
-    https://docs.racket-lang.org/xrepl/index.html
 *** Install third-party packages
 
     Gripe: In the style of many purist computer-science languages

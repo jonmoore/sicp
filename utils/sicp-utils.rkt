@@ -90,18 +90,17 @@
 (#%require (prefix r/ racket))
 (#%provide list->r/list-iter)
 (define (list->r/list-iter accum rest)
+  "Iterate over the sicp list rest, pushing results onto the racket list accum with
+Racket's cons"
   (if (null? rest)
       accum
       (list->r/list-iter (r/cons (car rest) accum) (cdr rest))))
 
 (#%provide list->r/list)
 (define (list->r/list lis)
-  ;;  "Map a sicp list to a racket list"
-;;  (displn lis)
+  "Map a sicp list to a racket list"
   (let* ((reversed-rlist (list->r/list-iter (r/list) lis))
          (ret     (r/reverse reversed-rlist)))
-  ;;  (displn reversed-rlist)
-  ;;  (displn ret)
     ret))
 
 (module+ test

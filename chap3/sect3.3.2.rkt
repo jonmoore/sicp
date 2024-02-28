@@ -29,7 +29,7 @@
 (define (insert-queue! queue item)
   ;; insert an item in a queue, return the queue
   (let ((new-pair (cons item '())))
-    (cond 
+    (cond
      ((empty-queue? queue)
       (set-front-ptr! queue new-pair)
       (set-rear-ptr! queue new-pair)
@@ -46,6 +46,13 @@
          (error "DELETE called with an empty queue" queue))
         (else
          (set-front-ptr! queue (cdr (front-ptr queue)))
+         ;; This is tidied up compared to the original, which left uncollected garbage in
+         ;; the rear-ptr slot.  It ensures that an empty queue has nil in both slots, like
+         ;; a queue created with make-queue.  See also exercise 3.21.
+         ;; (let ((second (cdr (front-ptr queue))))
+         ;;   (set-front-ptr! queue second)
+         ;;   (if (null? second)
+         ;;       (set-rear-ptr! queue second)))
          queue)))
 
 (module+ test
@@ -110,39 +117,33 @@
       (null? front-ptr))
     (define (dispatch m)
       (cond
-       ((eq? m 'empty-q?)
-        (empty?))
-       ((eq? m 'front-q)
-        (if (empty?)
-            (error "FRONT called with empty queue")
-            (car front-ptr)))
-       ((eq? m 'insert-q!)
-        (lambda (item)
-          (let ((new-pair (cons item '())))
-            (cond 
-             ((empty?)
-              (set! front-ptr new-pair)
-              (set! rear-ptr new-pair)
-              dispatch)
-             (else
-              (set-cdr! rear-ptr new-pair)
-              (set! rear-ptr new-pair)
-              dispatch)))))
-       ((eq? m 'delete-q!)
-        (cond
-         ((empty?)
-          (error "DELETE called with an empty queue"))
-         (else
-          (set! front-ptr (cdr front-ptr))
-          dispatch)))
-       (else
-        (error "DISPATCH called with unrecognized message" m))))
+       ((eq? m 'empty-q?)     (empty?))
+       ((eq? m 'front-q)      (if (empty?)
+                                  (error "FRONT called with empty queue")
+                                  (car front-ptr)))
+       ((eq? m 'insert-q!)    (lambda (item)
+                                (let ((new-pair (cons item '())))
+                                  (cond 
+                                    ((empty?)
+                                     (set! front-ptr new-pair)
+                                     (set! rear-ptr new-pair)
+                                     dispatch)
+                                    (else
+                                     (set-cdr! rear-ptr new-pair)
+                                     (set! rear-ptr new-pair)
+                                     dispatch)))))
+       ((eq? m 'delete-q!)    (cond
+                                ((empty?)
+                                 (error "DELETE called with an empty queue"))
+                                (else
+                                 (set! front-ptr (cdr front-ptr))
+                                 dispatch)))
+       (else                  (error "DISPATCH called with unrecognized message" m))))
     dispatch))
-
-(define (empty-q? q) (q 'empty-q?))
-(define (front-q q) (q 'front-q))
+(define (empty-q? q)       (q 'empty-q?))
+(define (front-q q)        (q 'front-q))
 (define (insert-q! q item) ((q 'insert-q!) item))
-(define (delete-q! q) (q 'delete-q!))
+(define (delete-q! q)      (q 'delete-q!))
 
 (module+ test
   (begin-example "3.22, queue as procedure with local state")
@@ -177,46 +178,54 @@
 ;; queue operations
 
 (define (make-node value dummy)
+  "A node represented as
+  - next: next node
+  - prev: previous node
+  - dummy: a tag indicating if the node contains a value
+  - value: if dummy is true, then a contained value
+
+  This is boilerplate except for the optional type implicitly represented by the 'dummy'
+  parameter"
   (define next nil)
   (define prev nil)
   (define (dispatch m)
     (cond
-     ((eq? m 'node-set-next!)
-      (lambda (item)
-        (set! next item)))
-     ((eq? m 'node-set-prev!)
-      (lambda (item)
-        (set! prev item)))
-     ((eq? m 'node-dummy)
-      dummy)
-     ((eq? m 'node-value)
-      (if dummy
-          (error "NODE-VALUE -- trying to get value of dummy node")
-          value))
-     ((eq? m 'node-next)
-      next)
-     ((eq? m 'node-prev)
-      prev)
-     (else
-      (error "NODE-DISPATCH unrecognized message" m))))
+     ((eq? m 'node-set-next!) (lambda (item)
+                                (set! next item)))
+     ((eq? m 'node-set-prev!) (lambda (item)
+                                (set! prev item)))
+     ((eq? m 'node-dummy)     dummy)
+     ((eq? m 'node-value)     (if dummy
+                                  (error "NODE-VALUE -- trying to get value of dummy node")
+                                  value))
+     ((eq? m 'node-next)      next)
+     ((eq? m 'node-prev)      prev)
+     (else                    (error "NODE-DISPATCH unrecognized message" m))))
   dispatch)
 (define (node-set-next! node item) ((node 'node-set-next!) item))
 (define (node-set-prev! node item) ((node 'node-set-prev!) item))
-(define (node-value node) (node 'node-value))
-(define (node-dummy node) (node 'node-dummy))
-(define (node-next node) (node 'node-next))
-(define (node-prev node) (node 'node-prev))
-(define (make-real-node value) (make-node value #f))
-;; idea
-;; fp                        rp
-;; nil - e1 - e2 - ... en - nil
+(define (node-value node)          (node 'node-value))
+(define (node-dummy node)          (node 'node-dummy))
+(define (node-next node)           (node 'node-next))
+(define (node-prev node)           (node 'node-prev))
+(define (make-real-node value)     (make-node value #f))
+(define (make-dummy-node value)    (make-node value #t))
 
 (define (make-deque)
-  (define begin-node (make-node "BEGIN-NODE" #t))
-  (define end-node (make-node "END-NODE" #t))
+  "A deque made up of nodes created by make-node
+
+ idea
+ 
+ begin-node el1  el2  ... eln end-node
+    dummy   val  val  ... val   dummy
+"  
+  (define begin-node (make-dummy-node "BEGIN-NODE"))
+  (define end-node   (make-dummy-node "END-NODE"))
   (define (front-node)
+    "The node after begin-node. This is a dummy iff the deque is empty"
     (node-next begin-node))
   (define (rear-node)
+    "The node before end-node.  This is a dummy iff the deque is empty"
     (node-prev end-node))
   (define (empty?)
     (node-dummy (front-node)))
@@ -230,39 +239,34 @@
     (node-set-next! prev next))
   (define (dispatch m)
     (cond
-     ((eq? m 'empty-deque?)
-      (empty?))
-     ((eq? m 'front-insert-deque!)
-      (lambda (item)
-        (insert-between (make-real-node item) begin-node (front-node))
-        dispatch))
-     ((eq? m 'front-deque)
-      (node-value (front-node)))
-     ((eq? m 'front-delete-deque!)
-      (node-join begin-node (node-next (front-node)))
-      dispatch)
-     ((eq? m 'rear-insert-deque!)
-      (lambda (item)
-        (insert-between (make-real-node item) (rear-node) end-node)
-        dispatch))
-     ((eq? m 'rear-deque)
-      (node-value (rear-node)))
-     ((eq? m 'rear-delete-deque!)
-      (node-join (node-prev (rear-node)) end-node)
-      dispatch)
+     ((eq? m 'empty-deque?)        (empty?))
+     ((eq? m 'front-deque)         (node-value (front-node)))
+     ((eq? m 'rear-deque)          (node-value (rear-node)))
+     ((eq? m 'front-insert-deque!) (lambda (value)
+                                     (insert-between (make-real-node value) begin-node (front-node))
+                                     dispatch))
+     ((eq? m 'rear-insert-deque!)  (lambda (value)
+                                     (insert-between (make-real-node value) (rear-node) end-node)
+                                     dispatch))
+     ;; the delete methods should check if the deque is empty
+     ((eq? m 'front-delete-deque!) (node-join begin-node (node-next (front-node)))
+                                   dispatch)
+     ((eq? m 'rear-delete-deque!)  (node-join (node-prev (rear-node)) end-node)
+                                   dispatch)
      (else
       (error "DEQUE-DISPATCH unrecognized message" m))))
   (node-set-next! begin-node end-node)
   (node-set-prev! end-node begin-node)
   dispatch)
-(define (empty-deque? deque) (deque 'empty-deque?))
-(define (front-insert-deque! deque item) ((deque 'front-insert-deque!) item))
-(define (front-deque deque) (deque 'front-deque))
-(define (front-delete-deque! deque) (deque 'front-delete-deque!))
+(define (empty-deque? deque)             (deque 'empty-deque?))
 
-(define (rear-insert-deque! deque item) ((deque 'rear-insert-deque!) item))
-(define (rear-deque deque) (deque 'rear-deque))
-(define (rear-delete-deque! deque) (deque 'rear-delete-deque!))
+(define (front-insert-deque! deque item) ((deque 'front-insert-deque!) item))
+(define (front-deque deque)              (deque 'front-deque))
+(define (front-delete-deque! deque)      (deque 'front-delete-deque!))
+
+(define (rear-insert-deque! deque item)  ((deque 'rear-insert-deque!) item))
+(define (rear-deque deque)               (deque 'rear-deque))
+(define (rear-delete-deque! deque)       (deque 'rear-delete-deque!))
 
 (module+ test
   (begin-example "3.23, deque implementation")
