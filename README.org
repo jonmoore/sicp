@@ -57,12 +57,6 @@
 make build
     #+END_SRC
 *** Run tests
-    All tests (also builds):
-    #+BEGIN_SRC
-make testall
-    #+END_SRC
-
-    Incremental tests (also builds):
     #+BEGIN_SRC
 make test
     #+END_SRC
