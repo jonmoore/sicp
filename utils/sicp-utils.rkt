@@ -1,6 +1,6 @@
 #lang sicp
 
-(#%require (only racket module+) rackunit)
+(#%require (only racket module+ define-namespace-anchor namespace-anchor->namespace) rackunit)
 
 ;; This creates a side-effect when this file is imported, making
 ;; racket output use "()" rather than "{}" to print lists created in
@@ -8,11 +8,12 @@
 ;; r5rs/init.
 (#%require (only racket print-mpair-curly-braces))
 (#%require "srfi-1.rkt")
+
 (print-mpair-curly-braces #t)
 
-;; (#%provide identity)
-;; (define (identity . args)
-;;   (apply values args))
+;; for use in testing this module
+(define-namespace-anchor -test-namespace-anchor)
+(define -test-ns (namespace-anchor->namespace -test-namespace-anchor))
 
 (#%provide disp)
 (define (disp text)
@@ -25,8 +26,14 @@
 
 (#%provide displn-eval)
 (define (displn-eval expr ns)
+  "Display and eval expr in namespace ns"
   (displn expr)
   (displn (eval expr ns)))
+
+(module+ test
+  (test-case
+      "displn-eval"
+    (displn-eval '(cons 4 2) -test-ns)))
 
 (#%provide begin-example)
 (define (begin-example text)
