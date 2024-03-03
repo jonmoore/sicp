@@ -14,13 +14,13 @@
         - [[#avoiding-use-of-racket-definitions][Avoiding use of ~racket~ definitions]]
 - [[#racket-how-tos][Racket how-tos]]
     - [[#run-a-script-including-main][Run a script, including main]]
+    - [[#get-useful-stack-traces-with-errortrace][Get useful stack traces with errortrace]]
     - [[#working-with-the-repl-always-use-xrepl][Working with the REPL (always use xrepl!!)]]
         - [[#use-xrepl-instead][Use xrepl instead]]
         - [[#run-a-repl-requiring-a-file][Run a REPL, requiring a file]]
         - [[#use-the-repl-inside-a-module][Use the REPL "inside" a module]]
         - [[#debug-in-the-repl][Debug in the repl]]
         - [[#get-help-in-the-repl][Get help in the repl]]
-        - [[#get-better-stack-traces-with-errortrace][Get better stack traces with errortrace]]
     - [[#selected-options-for-racket][Selected options for 'racket']]
     - [[#install-third-party-packages][Install third-party packages]]
     - [[#declare-dependencies-on-third-party-packages][Declare dependencies on third-party packages]]
@@ -137,10 +137,25 @@ raco test -t chap3\sect3.3.rkt
 
 * Racket how-tos
 *** Run a script, including main
+
+    Run as below:
+    : racket --lib errortrace --require file.rkt
+
+    Explanation: The errortrace library mitigates the woeful
+    incompleteness of the default "stack traces" provided by Racket
+    (no line numbers etc.).
+
+    https://docs.racket-lang.org/errortrace/index.html
+
+    At
+    https://groups.google.com/g/racket-users/c/CiwfIum7d4s/m/9_4fcT4zIHIJ
+    Robby Findler suggests using xrepl, drracket or emacs.
+
+    You can also run without errortrace:
     #+begin_src bat
       racket chap1\ex1.09-10.rkt
     #+end_src
-    The above is equivalent to any of these
+    This is equivalent to any of these
     #+begin_src shell
       racket -u chap1\ex1.09-10.rkt
       racket --require-script chap1\ex1.09-10.rkt
@@ -149,6 +164,8 @@ raco test -t chap3\sect3.3.rkt
       racket --eval  '(require (file "chap1\ex1.09-10.rkt"))' --name chap1\ex1.09-10.rkt
       # --name <file> sets `(find-system-path 'run-file)` to <file>
     #+end_src
+*** Get useful stack traces with errortrace
+
 *** Working with the REPL (always use xrepl!!)
 ***** Use xrepl instead
       Much better, should be the default:
@@ -188,20 +205,6 @@ raco test -t chap3\sect3.3.rkt
 ***** Get help in the repl
       Seems to be broken out of the box
       : (#%require racket/help)
-***** Get better stack traces with errortrace
-
-      gotcha: the default "stack traces" reported by racket are
-      incomplete, possibly due to optimizations.
-
-      To get more meaningful traces, use the errortrace library
-
-      : racket --lib errortrace --require file.rkt
-
-      https://docs.racket-lang.org/errortrace/index.html
-
-      At
-      https://groups.google.com/g/racket-users/c/CiwfIum7d4s/m/9_4fcT4zIHIJ
-      Robby Findler suggests using xrepl, drracket or emacs.
 *** Selected options for 'racket'
     : usage: racket [<option> ...] <argument> ...
     :
